@@ -1,5 +1,5 @@
 # A-kordey
-**A**ny **к**ey ch**ord**s generator -> A-kordey
+**A**ny **K**ey ch**ORD**s g**E**nerator -> **A-korde**y
 / 
 "Эй-корди" - генерация аккордов в любой мыслимой тональности.
 /
