@@ -1,258 +1,642 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<title>Генератор аккордов</title>
-<style>
-body { font-family: 'Courier New', monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; margin: 0; }
-#output { white-space: pre-wrap; line-height: 1.4; margin-bottom: 10px; min-height: 400px; padding: 15px; background: #2d2d2d; border: 1px solid #444; overflow-y: auto; }
-.input-line { display: flex; gap: 8px; padding: 10px; background: #2d2d2d; border: 1px solid #444; }
-.prompt { color: #4ec9b0; font-size: 18px; }
-#input { flex: 1; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 15px; background: #3c3c3c; color: #fff; border: none; }
-#input:focus { outline: 2px solid #007acc; }
-</style>
-</head>
-<body>
-<div id="output"></div>
-<div class="input-line"><span class="prompt">&gt;</span><input type="text" id="input" autocomplete="off"></div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const SHARP = String.fromCharCode(9839);
-  const FLAT = String.fromCharCode(9837);
-  const DIM = String.fromCharCode(176);
-  
-  const Vocabulary = {
-    keySignatures: {
-      "C-dur": "0", "G-dur": "1"+SHARP, "D-dur": "2"+SHARP, "A-dur": "3"+SHARP,
-      "E-dur": "4"+SHARP, "B-dur": "5"+SHARP, "Cb-dur": "7"+FLAT, "F#-dur": "6"+SHARP,
-      "Gb-dur": "6"+FLAT, "Db-dur": "5"+FLAT, "C#-dur": "7"+SHARP, "Ab-dur": "4"+FLAT,
-      "Eb-dur": "3"+FLAT, "Bb-dur": "2"+FLAT, "F-dur": "1"+FLAT,
-      "A-moll": "0", "E-moll": "1"+SHARP, "B-moll": "2"+SHARP, "F#-moll": "3"+SHARP,
-      "C#-moll": "4"+SHARP, "G#-moll": "5"+SHARP, "Ab-moll": "7"+FLAT, "Eb-moll": "6"+FLAT,
-      "D#-moll": "6"+SHARP, "Bb-moll": "5"+FLAT, "A#-moll": "7"+SHARP, "F-moll": "4"+FLAT,
-      "C-moll": "3"+FLAT, "G-moll": "2"+FLAT, "D-moll": "1"+FLAT
-    },
-    keyPairs: [
-      ["C-dur","A-moll"],["G-dur","E-moll"],["D-dur","B-moll"],["A-dur","F#-moll"],
-      ["E-dur","C#-moll"],["B-dur","G#-moll"],["Cb-dur","Ab-moll"],["Gb-dur","Eb-moll"],
-      ["F#-dur","D#-moll"],["C#-dur","A#-moll"],["Db-dur","Bb-moll"],["Ab-dur","F-moll"],
-      ["Eb-dur","C-moll"],["Bb-dur","G-moll"],["F-dur","D-moll"]
-    ],
-    allChords: {
-      "C-dur":["C","Dm","Em","F","G","Am","B"+DIM],
-      "G-dur":["G","Am","Bm","C","D","Em","F#"+DIM],
-      "D-dur":["D","Em","F#m","G","A","Bm","C#"+DIM],
-      "A-dur":["A","Bm","C#m","D","E","F#m","G#"+DIM],
-      "E-dur":["E","F#m","G#m","A","B","C#m","D#"+DIM],
-      "B-dur":["B","C#m","D#m","E","F#","G#m","A#"+DIM],
-      "F#-dur":["F#","G#m","A#m","B","C#","D#m","E#"+DIM],
-      "C#-dur":["C#","D#m","E#m","F#","G#","A#m","B#"+DIM],
-      "Cb-dur":["Cb","Dbm","Ebm","Fb","Gb","Abm","Bb"+DIM],
-      "Gb-dur":["Gb","Abm","Bbm","Cb","Db","Ebm","F"+DIM],
-      "Db-dur":["Db","Ebm","Fm","Gb","Ab","Bbm","C"+DIM],
-      "Ab-dur":["Ab","Bbm","Cm","Db","Eb","Fm","G"+DIM],
-      "Eb-dur":["Eb","Fm","Gm","Ab","Bb","Cm","D"+DIM],
-      "Bb-dur":["Bb","Cm","Dm","Eb","F","Gm","A"+DIM],
-      "F-dur":["F","Gm","Am","Bb","C","Dm","E"+DIM],
-      "A-moll":["Am","B"+DIM,"C","Dm","Em","F","G"],
-      "E-moll":["Em","F#"+DIM,"G","Am","Bm","C","D"],
-      "B-moll":["Bm","C#"+DIM,"D","Em","F#m","G","A"],
-      "F#-moll":["F#m","G#"+DIM,"A","Bm","C#m","D","E"],
-      "C#-moll":["C#m","D#"+DIM,"E","F#m","G#m","A","B"],
-      "Gb-moll":["Gb","Ab"+DIM,"Bb","Cb","Dbm","Eb","F"],
-      "Db-moll":["Db","Eb"+DIM,"F","Gb","Ab","Bb","C"],
-      "Ab-moll":["Ab","Bb"+DIM,"Cb","Db","Eb","F","G"],
-      "Eb-moll":["Eb","F"+DIM,"Gb","Ab","Bb","C","D"],
-      "D#-moll":["D#m","E#"+DIM,"F#","G#m","A#m","Bb","C#"],
-      "Bb-moll":["Bb","C"+DIM,"Db","Eb","Fm","G","A"],
-      "A#-moll":["A#m","B#"+DIM,"C#","D#m","E#m","F#","G#"],
-      "F-moll":["Fm","G"+DIM,"Ab","Bbm","Cm","D","E"],
-      "C-moll":["Cm","D"+DIM,"Eb","Fm","Gm","Ab","Bb"],
-      "G-moll":["Gm","A"+DIM,"Bb","Cm","Dm","Eb","F"],
-      "D-moll":["Dm","E"+DIM,"F","Gm","Am","Bb","C"]
-    }
-  };
-  
-  let output = document.getElementById('output');
-  let input = document.getElementById('input');
-  let state = '';
-  let key = '';
-  let keyIdx = 0;
-  let selectedChords = [];
-  let count = 4;
-  
-  function scrollToBottom() {
-    window.scrollTo(0, document.body.scrollHeight);
-    output.scrollTop = output.scrollHeight;
-  }
-  
-  function print(t) { 
-    output.innerHTML += t + '<br>'; 
-    scrollToBottom();
-  }
-  
-  function write(t) { 
-    output.innerHTML = t + '<br>'; 
-    scrollToBottom();
-  }
-  
-  input.focus();
-  input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { 
-      e.preventDefault(); 
-      e.stopPropagation(); 
-      let v = input.value.trim(); 
-      input.value = ''; 
-      handle(v);
-      scrollToBottom();
-    }
-  });
-  
-  document.addEventListener('click', function() { input.focus(); });
-  
-  function handle(v) {
-    if (state === 'chooseKeyNum') {
-      let choice = parseInt(v);
-      let majors = Vocabulary.keyPairs.map(p => p[0]);
-      let minors = Vocabulary.keyPairs.map(p => p[1]);
-      
-      if (!isNaN(choice) && choice >= 1 && choice <= majors.length) {
-        keyIdx = choice - 1;
-        print("Мажор (M) или минор (m): ");
-        state = 'chooseKeyType';
-      } else {
-        print("Неверный выбор, используется C-dur");
-        key = "C-dur";
-        chooseChords();
+  <head>
+    <meta charset="UTF-8" />
+    <title>Генератор аккордов</title>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        padding: 20px;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        margin: 0;
       }
-      
-    } else if (state === 'chooseKeyType') {
-      let type = v.trim();
-      let majors = Vocabulary.keyPairs.map(p => p[0]);
-      let minors = Vocabulary.keyPairs.map(p => p[1]);
-      
-      // Проверяем минор (только строчная m, moll, минор)
-      let isMinor = (type === 'm' || type === 'moll' || type === 'минор');
-      
-      if (isMinor) {
-        key = minors[keyIdx];
-      } else {
-        // Всё остальное (включая M, Maj, мажор, пусто) - мажор
-        key = majors[keyIdx];
+      #output {
+        white-space: pre-wrap;
+        line-height: 1.4;
+        margin-bottom: 10px;
+        min-height: 400px;
+        padding: 15px;
+        background: #2d2d2d;
+        border: 1px solid #444;
+        overflow-y: auto;
       }
-      
-      chooseChords();
-      
-    } else if (state === 'chooseChords') {
-      let chords = Vocabulary.allChords[key];
-      if (!chords) {
-        print("Ошибка: неизвестная тональность " + key);
-        return;
+      .input-line {
+        display: flex;
+        gap: 8px;
+        padding: 10px;
+        background: #2d2d2d;
+        border: 1px solid #444;
       }
-      
-      let trimmed = v.trim();
-      
-      if (!trimmed) {
-        selectedChords = chords;
-      } else {
-        selectedChords = trimmed.split(/\s+/).map(n => {
-          let i = parseInt(n);
-          return (!isNaN(i) && i >= 1 && i <= chords.length) ? chords[i-1] : null;
-        }).filter(x => x !== null);
-        
-        if (selectedChords.length === 0) {
-          selectedChords = chords;
+      .prompt {
+        color: #4ec9b0;
+        font-size: 18px;
+      }
+      #input {
+        flex: 1;
+        padding: 8px 12px;
+        font-family: "Courier New", monospace;
+        font-size: 15px;
+        background: #3c3c3c;
+        color: #fff;
+        border: none;
+      }
+      #input:focus {
+        outline: 2px solid #007acc;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="output"></div>
+    <div class="input-line">
+      <span class="prompt">></span
+      ><input type="text" id="input" autocomplete="off" />
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const SHARP = String.fromCharCode(9839);
+        const FLAT = String.fromCharCode(9837);
+        const DIM = String.fromCharCode(176);
+        const NOTE = "\u{1F3B5}"; // 🎵 Одна нота
+        const NOTES = "\u{1F3B6}"; // 🎶 Несколько нот
+        const PIANO = "\u{1F3B9}"; // 🎹 Клавишные
+        // Струнные
+        const GUITAR = "\u{1F3B8}"; // 🎸
+        const VIOLIN = "\u{1F3BB}"; // 🎻
+        const HARP = "\u{1F397}"; // 🎹 (Примечание: этот же символ используется для арфы)
+
+        // Духовые
+        const SAXOPHONE = "\u{1F3B7}"; // 🎷
+        const TRUMPET = "\u{1F3BA}"; // 🎺
+
+        // Ударные
+        const DRUM = "\u{1F941}"; // 🥁
+
+        // Прочее
+        const MICROPHONE = "\u{1F4A4}"; // 🎤
+        const HEADPHONES = "\u{1F3A7}"; // 🎧
+        const RADIO = "\u{1F4FB}"; // 📻
+
+        const Vocabulary = {
+          keySignatures: {
+            "C-dur": "0",
+            "G-dur": "1" + SHARP,
+            "D-dur": "2" + SHARP,
+            "A-dur": "3" + SHARP,
+            "E-dur": "4" + SHARP,
+            "B-dur": "5" + SHARP,
+            "F#-dur": "6" + SHARP,
+            "C#-dur": "7" + SHARP,
+            "Cb-dur": "7" + FLAT,
+            "Gb-dur": "6" + FLAT,
+            "Db-dur": "5" + FLAT,
+            "Ab-dur": "4" + FLAT,
+            "Eb-dur": "3" + FLAT,
+            "Bb-dur": "2" + FLAT,
+            "F-dur": "1" + FLAT,
+            "A-moll": "0",
+            "E-moll": "1" + SHARP,
+            "B-moll": "2" + SHARP,
+            "F#-moll": "3" + SHARP,
+            "C#-moll": "4" + SHARP,
+            "G#-moll": "5" + SHARP,
+            "Eb-moll": "6" + FLAT,
+            "Bb-moll": "5" + FLAT,
+            "F-moll": "4" + FLAT,
+            "C-moll": "3" + FLAT,
+            "G-moll": "2" + FLAT,
+            "D-moll": "1" + FLAT,
+          },
+          keyPairs: [
+            ["C-dur", "A-moll"],
+            ["G-dur", "E-moll"],
+            ["D-dur", "B-moll"],
+            ["A-dur", "F#-moll"],
+            ["E-dur", "C#-moll"],
+            ["B-dur", "G#-moll"],
+            ["F#-dur", "D#-moll"],
+            ["C#-dur", "A#-moll"],
+            ["Cb-dur", "Ab-moll"],
+            ["Gb-dur", "Eb-moll"],
+            ["Db-dur", "Bb-moll"],
+            ["Ab-dur", "F-moll"],
+            ["Eb-dur", "C-moll"],
+            ["Bb-dur", "G-moll"],
+            ["F-dur", "D-moll"],
+          ],
+          allChords: {
+            // Мажоры
+            "C-dur": ["C", "Dm", "Em", "F", "G", "Am", "B" + DIM],
+            "G-dur": ["G", "Am", "Bm", "C", "D", "Em", "F#" + DIM],
+            "D-dur": ["D", "Em", "F#m", "G", "A", "Bm", "C#" + DIM],
+            "A-dur": ["A", "Bm", "C#m", "D", "E", "F#m", "G#" + DIM],
+            "E-dur": ["E", "F#m", "G#m", "A", "B", "C#m", "D#" + DIM],
+            "B-dur": ["B", "C#m", "D#m", "E", "F#", "G#m", "A#" + DIM],
+            "F#-dur": ["F#", "G#m", "A#m", "B", "C#", "D#m", "E#" + DIM],
+            "C#-dur": ["C#", "D#m", "E#m", "F#", "G#", "A#m", "B#" + DIM],
+            "Cb-dur": ["Cb", "Dbm", "Ebm", "Fb", "Gb", "Abm", "Bb" + DIM],
+            "Gb-dur": ["Gb", "Abm", "Bbm", "Cb", "Db", "Ebm", "F" + DIM],
+            "Db-dur": ["Db", "Ebm", "Fm", "Gb", "Ab", "Bbm", "C" + DIM],
+            "Ab-dur": ["Ab", "Bbm", "Cm", "Db", "Eb", "Fm", "G" + DIM],
+            "Eb-dur": ["Eb", "Fm", "Gm", "Ab", "Bb", "Cm", "D" + DIM],
+            "Bb-dur": ["Bb", "Cm", "Dm", "Eb", "F", "Gm", "A" + DIM],
+            "F-dur": ["F", "Gm", "Am", "Bb", "C", "Dm", "E" + DIM],
+            // Миноры
+            "A-moll": ["Am", "B" + DIM, "C", "Dm", "Em", "F", "G"],
+            "E-moll": ["Em", "F#" + DIM, "G", "Am", "Bm", "C", "D"],
+            "B-moll": ["Bm", "C#" + DIM, "D", "Em", "F#m", "G", "A"],
+            "F#-moll": ["F#m", "G#" + DIM, "A", "Bm", "C#m", "D", "E"],
+            "C#-moll": ["C#m", "D#" + DIM, "E", "F#m", "G#m", "A", "B"],
+            "G#-moll": ["G#m", "A#" + DIM, "B", "C#m", "D#m", "E", "F#"],
+            "Ab-moll": ["Abm", "Bb" + DIM, "Cb", "Dbm", "Ebm", "Fb", "Gb"],
+            "Eb-moll": ["Eb", "F" + DIM, "Gb", "Ab", "Bb", "Cm", "D"],
+            "Bb-moll": ["Bb", "C" + DIM, "Db", "Eb", "Fm", "G", "Ab"],
+            "F-moll": ["Fm", "G" + DIM, "Ab", "Bbm", "Cm", "D", "Eb"],
+            "C-moll": ["Cm", "D" + DIM, "Eb", "Fm", "Gm", "Ab", "Bb"],
+            "G-moll": ["Gm", "A" + DIM, "Bb", "Cm", "Dm", "Eb", "F"],
+            "D-moll": ["Dm", "E" + DIM, "F", "Gm", "Am", "Bb", "C"],
+            "D#-moll": ["D#m", "E#" + DIM, "F#", "G#m", "A#m", "Bb", "C#"],
+            "A#-moll": ["A#m", "B#" + DIM, "C#", "D#m", "E#m", "F#", "G#"],
+          },
+
+          // НОВОЕ: Справочник видов кадансов
+          cadenceTypes: {
+            0: {
+              name: "ПФО",
+              desc: "SDT",
+              templateSteps: [4, 5, 1], // IV -> V -> I
+            },
+            1: {
+              name: "Автентический",
+              desc: "Классическое разрешение доминанты в тонику.",
+              templateSteps: [5, 1], // V -> I
+            },
+            2: {
+              name: "Плагальный",
+              desc: "Разрешение субдоминанты в тонику.",
+              templateSteps: [4, 1], // IV -> I
+            },
+            3: {
+              name: "Прерванный",
+              desc: "Ожидание разрешения в тонику, но уход в другой аккорд (обычно VI).",
+              templateSteps: [5, 6], // V -> VI
+            },
+            4: {
+              name: "Доминантовый",
+              desc: "Завершение на аккорде доминанты, создающее напряжение.",
+              templateSteps: [5], // V
+            },
+            // Новая запись:
+            5: {
+              name: "Вводный",
+              desc: "Начинается с аккорда VII ступени, разрешается в тонику.",
+              templateSteps: [7, 1], // VII -> I
+            },
+          },
+        };
+
+        let output = document.getElementById("output");
+        let input = document.getElementById("input");
+        let state = "";
+        let key = "";
+        let keyIdx = 0;
+        let selectedChords = [];
+        let selectedSteps = [];
+        let sequenceLength = 4;
+        let forbidVtoIV = true;
+
+        // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+        function scrollToBottom() {
+          window.scrollTo(0, document.body.scrollHeight);
+          output.scrollTop = output.scrollHeight;
         }
-      }
-      
-      askCount();
-      
-    } else if (state === 'askCount') {
-      count = parseInt(v);
-      if (isNaN(count) || count <= 0) {
-        count = 4;
-      }
-      generate();
-      
-    } else if (state === 'askRepeat') {
-      if (v === '1') {
-        generate();
-      } else if (v === '2') {
-        chooseChords();
-      } else if (v === '3') {
-        start();
-      } else {
-        print("Спасибо за использование!");
-        state = 'end';
-      }
-    }
-  }
-  
-  function start() {
-    state = 'chooseKeyNum';
-    write("=== Генератор последовательностей аккордов ==="); 
-    print("");
-    print("В каждой тональности есть по 7 аккордов, связанных музыкальной гармонией.");
-    print("Давайте сгенерируем случайную последовательность аккордов в любой из тональностей!");
-    print("*-dur - мажорные тональности, *-moll - минорные\n");
-    print("Шаг 1: Выбор тональности\n");
-    print("    № | Мажор (M)       | минор (m)       | Знаки альтерации");
-    print("------|-----------------|-----------------|-----------------");
-    
-    Vocabulary.keyPairs.forEach((pair, i) => {
-      let maj = pair[0];
-      let min = pair[1];
-      let sig = Vocabulary.keySignatures[maj] || "?";
-      print((i+1).toString().padStart(5) + " | " + maj.padEnd(15) + " | " + min.padEnd(15) + " | " + sig);
-    });
-    
-    print("\nВведите номер строки: ");
-    input.focus();
-    scrollToBottom();
-  }
-  
-  function chooseChords() {
-    state = 'chooseChords';
-    let chords = Vocabulary.allChords[key];
-    print("\nШаг 2: Доступные аккорды выбранной тональности: " + key);
-    chords.forEach((c, i) => print((i+1) + ". " + c));
-    print("Введите номера аккордов через пробел (Enter для всех): ");
-    input.focus();
-    scrollToBottom();
-  }
-  
-  function askCount() {
-    state = 'askCount';
-    print("\nШаг 3: количество аккордов в последовательности");
-    print("Сколько аккордов в последовательности? (по умолчанию 4): ");
-    input.focus();
-    scrollToBottom();
-  }
-  
-  function generate() {
-    state = 'askRepeat';
-    let seq = [];
-    for (let i = 0; i < count; i++) {
-      seq.push(selectedChords[Math.floor(Math.random() * selectedChords.length)]);
-    }
-    
-    print("\n=== Последовательность в " + key + ", которую мы заслужили ===");
-    for (let i = 0; i < seq.length; i += 4) {
-      print(seq.slice(i, i+4).join(' '));
-    }
-    
-    print("\nЕще?");
-    print("1 — сгенерировать еще раз с теми же аккордами");
-    print("2 — выбрать другие аккорды в той же тональности");
-    print("3 — выбрать новую тональность");
-    print("4 — выйти");
-    print("Ваш выбор: ");
-    input.focus();
-    scrollToBottom();
-  }
-  
-  start();
-});
-</script>
-</body>
+        function print(text) {
+          const line = document.createElement("div");
+          line.textContent = text + "\n";
+          output.appendChild(line);
+          scrollToBottom();
+        }
+
+        function getDimStep(keyName) {
+          return keyName.includes("-dur") ? 7 : 2;
+        }
+
+        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ПАРСИНГА ---
+        function parseChordSelection(userInput, chords) {
+          const s = String(userInput || "").trim();
+          const dimStep = getDimStep(key);
+
+          if (s === "0") {
+            print("Выбраны все аккорды, включая уменьшённый.");
+            return Array.from({ length: 7 }, (_, i) => ({
+              chord: chords[i],
+              step: i + 1,
+            }));
+          } else if (s === "") {
+            print("Выбраны все аккорды, кроме уменьшённого.");
+            return [1, 2, 3, 4, 5, 6, 7]
+              .filter((i) => i !== dimStep)
+              .map((i) => ({ chord: chords[i - 1], step: i }));
+          } else {
+            const indices = [
+              ...new Set(
+                s
+                  .split("")
+                  .map((x) => parseInt(x, 10))
+                  .filter((n) => !isNaN(n) && n >= 1 && n <= 7)
+              ),
+            ];
+            return indices
+              .map((i) => ({ chord: chords[i - 1], step: i }))
+              .filter((x) => x.chord);
+          }
+        }
+
+        // --- ЛОГИКА ГАРМОНИИ (для режима с теорией) ---
+        const TONIC = "T";
+        const SUBDOMINANT = "S";
+        const DOMINANT = "D";
+
+        const TRANSITION_MATRIX = {
+          [TONIC]: { [TONIC]: 1, [SUBDOMINANT]: 3, [DOMINANT]: 2 },
+          [SUBDOMINANT]: { [TONIC]: 2, [SUBDOMINANT]: 1, [DOMINANT]: 4 },
+          [DOMINANT]: { [TONIC]: 5, [SUBDOMINANT]: 1, [DOMINANT]: 1 },
+        };
+
+        function getChordFunction(step) {
+          if ([1, 3, 6].includes(step)) return TONIC;
+          if ([2, 4].includes(step)) return SUBDOMINANT;
+          if ([5, 7].includes(step)) return DOMINANT;
+          return null;
+        }
+
+        function chooseNextChord(prevStep) {
+          if (!prevStep) {
+            let idx = Math.floor(Math.random() * selectedChords.length);
+            return { chord: selectedChords[idx], step: selectedSteps[idx] };
+          }
+
+          let prevFunction = getChordFunction(prevStep);
+          if (!prevFunction) return null;
+
+          let weightsForTransition = TRANSITION_MATRIX[prevFunction];
+
+          let candidates = [];
+          selectedSteps.forEach((step, idx) => {
+            let stepFunction = getChordFunction(step);
+            let weight = weightsForTransition[stepFunction] || 0;
+
+            // ЗАПРЕТ V -> IV
+            if (
+              forbidVtoIV &&
+              prevFunction === DOMINANT &&
+              stepFunction === SUBDOMINANT
+            ) {
+              weight = 0;
+            }
+
+            for (let i = 0; i < weight; i++) candidates.push(idx);
+          });
+
+          if (candidates.length === 0) return null;
+
+          let chosenIdx =
+            candidates[Math.floor(Math.random() * candidates.length)];
+          return {
+            chord: selectedChords[chosenIdx],
+            step: selectedSteps[chosenIdx],
+          };
+        }
+
+        // --- ОСНОВНАЯ ЛОГИКА И УПРАВЛЕНИЕ СОСТОЯНИЕМ ---
+        input.focus();
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            const userInput = input.value.trim();
+            input.value = "";
+            handle(userInput);
+            scrollToBottom();
+          }
+        });
+        document.addEventListener("click", function () {
+          input.focus();
+        });
+
+        function handle(userInput) {
+          if (userInput) {
+            print("📝Вы ввели: '" + userInput + "'");
+            print("");
+          }
+
+          if (state === "chooseKeyNum") {
+            const choice = userInput.trim();
+
+            // --- НОВАЯ ЛОГИКА ДЛЯ ВВОДА "00" ---
+            if (choice === "00") {
+              print(
+                "⚡️Быстрый старт: выбираем случайную тональность и сразу генерируем последовательность...🎲"
+              );
+              print("Вжух!");
+
+              // Шаг 1: Выбираем случайный номер строки от 1 до 15
+              keyIdx = Math.floor(Math.random() * 15);
+
+              // Шаг 2: Случайно выбираем лад (0 - мажор, 1 - минор)
+              const randomMode = Math.round(Math.random());
+              key = Vocabulary.keyPairs[keyIdx][randomMode];
+
+              // Шаг 3: Сразу выбираем все аккорды этой тональности
+              selectedChords = Vocabulary.allChords[key].slice(); // Создаем копию массива
+              selectedSteps = [1, 2, 3, 4, 5, 6, 7]; // Все ступени
+
+              // Шаг 4: Устанавливаем длину последовательности в 4
+              sequenceLength = 4;
+
+              // Шаг 5: Запускаем генерацию
+              generate();
+
+              return; // ВАЖНО: выходим из функции handle, чтобы не выполнять остальной код
+            }
+            // --- КОНЕЦ НОВОЙ ЛОГИКИ ---
+
+            if (choice === "0") {
+              // Генерируем случайный номер строки от 1 до 15
+              keyIdx = Math.floor(Math.random() * 15);
+
+              // Генерируем случайное число 0 или 1 для выбора лада
+              // 0 -> Мажор, 1 -> Минор
+              const randomMode = Math.round(Math.random());
+
+              // Выбираем тональность напрямую из массива пар
+              key = Vocabulary.keyPairs[keyIdx][randomMode];
+
+              print(
+                "🎲 Выбор тональности был доверен случаю. Что же достанется вам на этот раз?"
+              );
+              print("\n"); // Добавляем перенос для красоты
+              chooseChords(); // Сразу переходим к выбору аккордов
+            } else {
+              // Старая логика для ручного ввода номера
+              const numericChoice = parseInt(choice);
+              const majors = Vocabulary.keyPairs.map((p) => p[0]);
+
+              if (
+                !isNaN(numericChoice) &&
+                numericChoice >= 1 &&
+                numericChoice <= majors.length
+              ) {
+                keyIdx = numericChoice - 1;
+                print("🎭 Мажор (M)/[⤶] или минор (m): ");
+                state = "chooseKeyType";
+              } else {
+                print("Неверный выбор. Используется C-dur");
+                key = majors[0];
+                chooseChords();
+              }
+            }
+          } else if (state === "chooseKeyType") {
+            const answerType = userInput.trim();
+            const majors = Vocabulary.keyPairs.map((p) => p[0]);
+            const minors = Vocabulary.keyPairs.map((p) => p[1]);
+            key =
+              answerType === "m" || answerType === "moll"
+                ? minors[keyIdx]
+                : majors[keyIdx];
+            chooseChords();
+          } else if (state === "chooseChords") {
+            const chordsInKey = Vocabulary.allChords[key];
+            if (!chordsInKey) {
+              print("Ошибка тональности");
+              return;
+            }
+            const items = parseChordSelection(userInput, chordsInKey);
+            selectedChords = items.map((x) => x.chord);
+            selectedSteps = items.map((x) => x.step);
+            askVtoIV();
+          } else if (state === "askVtoIV") {
+            const answerType = (userInput || "1").trim().toLowerCase();
+            forbidVtoIV = !(
+              answerType === "2" ||
+              answerType === "н" ||
+              answerType === "нет" ||
+              answerType === "no"
+            );
+            askCount();
+          } else if (state === "askCount") {
+            sequenceLength = parseInt(userInput);
+            if (isNaN(sequenceLength) || sequenceLength < 3) {
+              sequenceLength = 3;
+              print(
+                "Минимальная длина последовательности — 3. Установлено значение: 3"
+              );
+            }
+            generate();
+          } else if (state === "askRepeat") {
+            if (userInput === "1") generate();
+            else if (userInput === "2") chooseChords();
+            else if (userInput === "3") start();
+          }
+        }
+
+        print(NOTE + PIANO + " A-kordey / Аккорды " + GUITAR + NOTES);
+        print("генератор последовательностей аккордов");
+        print("by Dm.Isanin" + MICROPHONE);
+        print("\n");
+        print(
+          'В современной музыке 24 тональности. У шести из тональностей есть по одной сестре-"синониму" (см. 5' +
+            SHARP +
+            "=7" +
+            FLAT +
+            ", 7" +
+            SHARP +
+            "=5" +
+            FLAT +
+            " и 6" +
+            SHARP +
+            "=6" +
+            FLAT +
+            ")"
+        );
+        print("В таблице ниже представлены все они и их ключевые знаки.");
+        print("\n");
+
+        function start() {
+          state = "chooseKeyNum";
+
+          print("_________________");
+          print("🎼 Шаг 1. Выбор тональности.\n");
+          print("    № | Мажор (M)      | минор (m)      | Ключевые знаки");
+          print("------|----------------|----------------|-----------------");
+          Vocabulary.keyPairs.forEach((pair, i) => {
+            const maj = pair[0];
+            const min = pair[1];
+            const sig = Vocabulary.keySignatures[maj] || "?";
+            print(
+              (i + 1).toString().padStart(5) +
+                " | " +
+                maj.padEnd(15) +
+                "| " +
+                min.padEnd(15) +
+                "| " +
+                sig
+            );
+          });
+          print("\n⌨️ Введите: __ ");
+          print(" (  Enter ) [⤶] для выбора C-dur");
+          print(" ( 1 - 15 ) 🔢 номер строки от 1 до 15");
+          print(" (    0   ) 🚀 для быстрого выбора случайной тональности 🎲");
+          print(
+            ' (   00   ) ⚡️ для быстрой генерации "случайной" последовательности 🎲'
+          );
+          input.focus();
+        }
+
+        function chooseChords() {
+          state = "chooseChords";
+          const chordsInKey = Vocabulary.allChords[key];
+          print("Выбрана тональность: " + key + "\n");
+          print("_________________");
+          print("🎹 Шаг 2. Выберите аккорды для генерации.\n");
+          print("Доступные аккорды в тональности " + key + ":\n");
+          chordsInKey.forEach((c, i) => print(i + 1 + ". " + c));
+          print("\n⌨️Введите: __ ");
+          print(" [⤶] Enter для выбора всех кроме уменьшённого (°)");
+          print(" 0️⃣ для выбора всех");
+          print(
+            " 🔢 номера выбираемых аккордов (например, самых \"блатных\": '145'), разделитель не обязателен\n"
+          );
+          input.focus();
+        }
+
+        function askVtoIV() {
+          state = "askVtoIV";
+          print("_________________");
+          print("⚙️ Шаг 3. Режим генерации");
+          print("\n⌨️ Введите: __ ");
+          print(
+            " ( 1 ) или [⤶] 📐 Соблюдать законы теории функций из муз. гармонии (заканчивать кадансом, запрет перехода V -> IV)"
+          );
+          print(" ( 2 ) 🎨 Создать цепочку аккордов в свободном стиле\n");
+        }
+
+        function askCount() {
+          state = "askCount";
+          print("_________________");
+          print("📏 Шаг 4. Длина последовательности");
+          print(" 🔢 Укажите число аккордов в последовательности: __ ");
+          print(" [⤶] по умолчанию выставляется минимальное значение: 3");
+        }
+
+        // --- НОВАЯ ФУНКЦИЯ КАДАНСА ---
+        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ КАДАНСА С ПОДДЕРЖКОЙ ПОЛНОГО ФУНКЦИОНАЛЬНОГО ОБОРОТА ---
+        // --- УЛУЧШЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ КАДАНСА ---
+
+        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ С ИСПОЛЬЗОВАНИЕМ КАДАНСА ---
+        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ С ИСПОЛЬЗОВАНИЕМ КАДАНСА ---
+        function generate() {
+            state = "askRepeat";
+            let sequenceChords = [];
+            let sequenceStepsArr = [];
+            let currentStep = null;
+
+            // --- НОВАЯ ЛОГИКА: Выбор каданса ТОЛЬКО если он возможен ---
+            let selectedCadenceInfo = null;
+
+            if (forbidVtoIV) { 
+                const cadenceTypeIds = Object.keys(Vocabulary.cadenceTypes);
+                
+                // Создаем список всех возможных ступеней во всех кадансах
+                const allPossibleCadenceSteps = new Set();
+                for (let id of cadenceTypeIds) {
+                    Vocabulary.cadenceTypes[id].templateSteps.forEach(step => allPossibleCadenceSteps.add(step));
+                }
+
+                // Проверяем, есть ли у пользователя аккорды для ВСЕХ этих ступеней
+                let canApplyCadence = true;
+                for (let step of allPossibleCadenceSteps) {
+                    if (!selectedSteps.includes(step)) {
+                        canApplyCadence = false;
+                        break; // Если хотя бы одной ступени нет - выходим
+                    }
+                }
+
+                if (canApplyCadence) {
+                    // Только теперь, если проверка пройдена, выбираем случайный каданс
+                    const randomId = cadenceTypeIds[Math.floor(Math.random() * cadenceTypeIds.length)];
+                    selectedCadenceInfo = Vocabulary.cadenceTypes[randomId];
+                    print(`\nВыбран каданс: ${selectedCadenceInfo.name} (${selectedCadenceInfo.desc})`);
+                } else {
+                    print("\n⚠️ Для применения кадансов необходимо выбрать аккорды, соответствующие всем возможным ступеням (I, IV, V, VI, VII).");
+                    print("Будет сгенерирована свободная последовательность без каданса.\n");
+                }
+            }
+            
+            // --- ГЕНЕРАЦИЯ ПОСЛЕДОВАТЕЛЬНОСТИ ---
+            while (sequenceChords.length < sequenceLength) {
+                let nextItem;
+                
+                if (currentStep === null) {
+                    nextItem = chooseNextChord(null);
+                } else {
+                    nextItem = chooseNextChord(currentStep);
+                }
+
+                if (!nextItem) break; // Защита от зависания
+
+                sequenceChords.push(nextItem.chord);
+                sequenceStepsArr.push(nextItem.step);
+                currentStep = nextItem.step;
+            }
+
+            // --- ПРИМЕНЕНИЕ КАДАНСА (блок остается прежним, но выполнится только если selectedCadenceInfo не null) ---
+            if (selectedCadenceInfo && forbidVtoIV) {
+                sequenceChords.splice(sequenceLength - selectedCadenceInfo.templateSteps.length);
+                sequenceStepsArr.splice(sequenceLength - selectedCadenceInfo.templateSteps.length);
+
+                for (let stepNum of selectedCadenceInfo.templateSteps) {
+                    const indexInSelected = selectedSteps.indexOf(stepNum);
+                    if (indexInSelected !== -1) {
+                        sequenceChords.push(selectedChords[indexInSelected]);
+                        sequenceStepsArr.push(stepNum);
+                    } else {
+                        let replacement = findReplacementByFunction(getChordFunction(stepNum));
+                        if (replacement) {
+                            sequenceChords.push(replacement.chord);
+                            sequenceStepsArr.push(replacement.step);
+                        } else if (sequenceChords.length > 0) {
+                            sequenceChords.push(sequenceChords[sequenceChords.length - 1]);
+                            sequenceStepsArr.push(sequenceStepsArr[sequenceStepsArr.length - 1]);
+                        }
+                    }
+                }
+            }
+
+            // Вывод результата
+            print("\n");
+            print("🎶 Ваша последовательность в тональности " + key + " 🎶");
+            for (let i = 0; i < sequenceChords.length; i += 4) {
+                print(sequenceChords.slice(i, i + 4).join(" "));
+            }
+
+            // Сообщение о применённом кадансе выводим тоже только если он был применён
+            if (selectedCadenceInfo && forbidVtoIV) {
+                print(`\nПрименён каданс: ${selectedCadenceInfo.name} — ${selectedCadenceInfo.desc}`);
+            }
+
+            print("\nЧто делаем дальше? __");
+            print(" ( 1 ) — 🔁 сгенерировать еще раз");
+            print(" ( 2 ) — 🎹 выбрать другие аккорды");
+            print(" ( 3 ) — 🎼 выбрать другую тональность");
+            print(" Ctrl+R — обновить страницу");
+            
+            print("\nВаш выбор: __ ");
+        }
+
+        start(); // Запуск программы при загрузке страницы
+      });
+    </script>
+  </body>
 </html>
