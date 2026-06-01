@@ -567,7 +567,7 @@
                     // Только теперь, если проверка пройдена, выбираем случайный каданс
                     const randomId = cadenceTypeIds[Math.floor(Math.random() * cadenceTypeIds.length)];
                     selectedCadenceInfo = Vocabulary.cadenceTypes[randomId];
-                    print(`\nВыбран каданс: ${selectedCadenceInfo.name} (${selectedCadenceInfo.desc})`);
+                    
                 } else {
                     print("\n⚠️ Для применения кадансов необходимо выбрать аккорды, соответствующие всем возможным ступеням (I, IV, V, VI, VII).");
                     print("Будет сгенерирована свободная последовательность без каданса.\n");
