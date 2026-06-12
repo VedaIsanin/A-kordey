@@ -4,23 +4,30 @@
     <meta charset="UTF-8" />
     <title>Генератор аккордов</title>
     <style>
+      /* --- ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ --- */
       body {
         font-family: "Courier New", monospace;
         padding: 20px;
         background: #1e1e1e;
         color: #d4d4d4;
         margin: 0;
+        max-width: 960px; /* Ограничиваем ширину всего контента */
+        margin-left: auto;
+        margin-right: auto;
       }
+      
       #output {
         white-space: pre-wrap;
-        line-height: 1.4;
-        margin-bottom: 10px;
-        min-height: 400px;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        min-height: 300px;
         padding: 15px;
         background: #2d2d2d;
         border: 1px solid #444;
         overflow-y: auto;
+        word-break: break-word; /* Разрешаем длинные слова переносить */
       }
+
       .input-line {
         display: flex;
         gap: 8px;
@@ -28,10 +35,13 @@
         background: #2d2d2d;
         border: 1px solid #444;
       }
+
       .prompt {
         color: #4ec9b0;
         font-size: 18px;
+        align-self: center;
       }
+
       #input {
         flex: 1;
         padding: 8px 12px;
@@ -41,10 +51,127 @@
         color: #fff;
         border: none;
       }
+
       #input:focus {
         outline: 2px solid #007acc;
       }
+
+      /* --- НОВЫЕ СТИЛИ ДЛЯ ТАБЛИЦЫ ТОНАЛЬНОСТЕЙ --- */
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+          word-break: keep-all; /* Чтобы названия тональностей не рвались по буквам */
+      }
+
+      th, td {
+          padding: 8px;
+          border: 1px solid #444;
+          white-space: nowrap; /* Запрещаем перенос текста по умолчанию */
+          /*overflow: hidden;   /* Скрываем то, что выходит за границы */
+          text-overflow: ellipsis; /* Ставим троеточие ... если текст обрезан */
+      }
+
+      /* Стили для заголовков столбцов */
+      th {
+          background-color: #333;
+          font-weight: bold;
+      }
+
+      /* Стили для ячеек данных */
+      td {
+          background-color: #2d2d2d;
+      }
+
+      /* Показываем полный текст при наведении */
+      td:hover::after {
+          content: attr(data-full-text);
+          position: absolute;
+          background: #333;
+          border: 1px solid #555;
+          padding: 4px 8px;
+          z-index: 10;
+          white-space: normal; /* Позволяем тексту переноситься во всплывающей подсказке */
+          word-break: break-word;
+      }
+
+      /* --- СТИЛИ ДЛЯ ТАБУЛАТУР (без изменений) --- */
+      .chord-diagram-container {
+    /* display: flex; Убираем это */
+    /* flex-wrap: wrap; Убираем это */
+    /* gap: 8px; Убираем это */
+    /* justify-content: center; Убираем это */
+    
+            display: block; /* Добавляем это, чтобы каждый блок .chord-diagram был на новой строке */
+            margin-top: 5px; /* <-- Вот этот отступ создает пустое пространство после имени аккорда*/
+            text-align: left;
+            box-sizing: border-box;
+}
+
+/* область схемы аппликатуры аккорда (фоновый бокс)*/
+.chord-diagram {
+    display: flex;
+    flex-direction: column;
+    font-family: "Courier New", monospace;
+    font-size: 14px; /* Уменьшаем шрифт */
+    color: #fff;
+    background-color: #333;
+    border: 2px solid #555;
+    border-radius: 4px;
+    padding: 8px;
+    width: fit-content;
+    max-width: 300px; /* Новая ширина, достаточная для 6 струн */
+    margin-right: 10px;
+    box-sizing: border-box;
+    min-height: 70px; /* Уменьшаем высоту */
+}
+
+.chord-name {
+    font-weight: bold;
+    /*margin-bottom: -6px; /* Это значение создает отступ  до аппликатуры*/
+    text-align: center;
+}
+
+.chord-string {
+    display: flex;
+    align-items: center; /* Выравниваем по центру по вертикали */
+    margin-bottom: -3px;
+}
+
+/* Компактный бокс для лада */
+.chord-fret {
+    
+    display: flex; /* Включаем контекст для центрирования */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    
+    width: 11px; /* Увеличиваем ширину каждого бокса */
+    height: 18px; /* Фиксированная высота бокса */
+    
+    margin-right: 2px; /* Отступ между боксами */
+    
+    font-weight: bold;
+    font-size: 12px; /* Маленький, но читаемый шрифт */
+    
+    /* --- НОВЫЕ СВОЙСТВА ДЛЯ РЕШЕНИЯ ПРОБЛЕМЫ --- */
+    /*overflow: hidden; /* Отрезаем всё, что выходит за границы бокса */
+    /*text-overflow: ellipsis; /* (Опционально) Ставит троеточие, если текст отрезается */
+}
+
+.chord-fret-x {
+    color: red;
+    width: 10px; /* Увеличиваем ширину каждого бокса */
+    font-size: 14px; /* Чуть крупнее для 'x' */
+}
+
+      .chord-string-line {
+          width: 100%;
+          height: 2px;
+          background-color: #fff;
+          flex-grow: 1;
+      }
     </style>
+
   </head>
   <body>
     <div id="output"></div>
@@ -194,7 +321,85 @@
               templateSteps: [7, 1], // VII -> I
             },
           },
+
+                     /* --- НОВОЕ: Справочник табулатур (аппликатур) для гитары --- */
+                     chordDiagrams: {
+            // -- МАЖОРНЫЕ АККОРДЫ --
+            "C": ["x-3-2-0-1-0", "x-3-5-5-5-3", "8-10-10-9-8-8"],
+            "D": ["x-x-0-2-3-2", "x-5-7-7-7-5", "10-12-12-11-10-10"],
+            "E": ["0-2-2-1-0-0", "0-x-2-4-5-4", "x-7-9-9-9-7", "12-14-14-13-12-12"],
+            "F": ["1-3-3-2-1-1", "x-x-3-5-6-5", "x-8-10-10-10-8"],
+            "G": ["3-2-0-0-0-3", "3-2-0-0-3-3", "3-5-5-4-3-3"],
+            "A": ["x-0-2-2-2-0", "5-7-7-6-5-5", "x-0-2-2-0-0"],
+            "B": ["x-2-4-4-4-2", "7-x-x-8-7-7"],
+
+            // Альтерированные мажоры (диезы)
+            "F#": ["2-4-4-3-2-2", "x-x-4-6-7-6", "x-9-11-11-11-9"],
+            "C#": ["x-4-6-6-6-x", "9-11-11-10-9"],
+            "G#": ["4-6-6-5-4-x", "x-11-13-13-13"],
+            "A#": ["x-1-3-3-3-1", "6-8-8-7-6-6"], // ~=Bb
+
+            // Аккорды с бемолем (добавлены)
+            "Cb": ["x-2-4-4-4-x", "7-9-9-8-7-7", "x-2-4-4-4-x"], 
+            "Db": ["x-4-6-6-6-4"], // C#
+            "Eb": ["x-6-8-8-8-6", "x-6-5-3-4-3"],
+            "Fb": ["0-2-2-1-0-0", "x-7-9-9-9-7", "12-14-14-13-12"], 
+            "Gb": ["2-4-4-3-2-2"], // F#
+            "Ab": ["4-6-6-5-4-4", "x-x-6-5-7-5"], // G#
+            "Bb": ["x-1-3-3-3-1", "6-8-8-7-6-6"], // ~=A#
+
+            // -- МИНОРНЫЕ АККОРДЫ --
+            "Cm": ["x-3-5-5-4-3", "8-10-10-8-8"],
+            "Dm": ["x-x-0-2-3-1", "x-5-7-7-6-5"],
+            "Em": ["0-2-2-0-0-0", "x-7-9-9-8-7"],
+            "Fm": ["1-3-3-1-1-1", "x-8-10-10-9"],
+            "Gm": ["3-5-5-3-3-3", "3-5-5-3-6-3"],
+            "Am": ["x-0-2-2-1-0", "5-7-7-5-5-5"],
+            "Bm": ["x-2-4-4-3-2", "7-9-9-7-7-7", "x-2-4-4-3-2"], 
+
+            // Альтерированные миноры (диезы)
+            "E#m": ["1-3-3-1-1-1", "x-8-10-10-9-8"],
+            "F#m": ["2-4-4-2-2-2", "x-9-11-11-10-9"],
+            "C#m": ["x-4-6-6-5-4", "9-11-11-9-9-9"],
+
+            // Миноры с бемолем (добавлены)
+            "G#m": ["4-6-6-4-4-4", "x-11-13-13-12-11"],
+            "Ebm": ["x-6-8-8-8-6", "x-6-8-8-7-6"], // Использует форму Eb мажора с изменением одной ноты
+            "Bbm": ["x-1-3-3-2-1", "6-8-8-6-6-6"], // ДОБАВЛЕНО: Классическая и баррэ аппликатура
+            "A#m": ["x-1-3-3-2-1", "6-8-8-6-6-6"], // Энгармонизм Bbm
+            "D#m": ["x-6-8-8-7-6", "x-6-8-8-7-8"], // Энгармонизм Ebm
+
+            // Энгармонизмы миноров
+            "Abm": ["4-6-6-4-4-4"], // G#m
+
+            // Базовая аппликатура для C°, D°, E° и G°
+            "C°": ["x-3-2-0-1-0"],
+            "D°": ["x-5-6-5-6-x"],
+            "E°": ["0-7-6-7-x-x"],
+            "G°": ["3-x-6-5-6-x"],
+            "A#°": ["x-1-2-1-2-1"],
+
+            // Базовая аппликатура для B°, C#°, F#° и A°
+            "B°": ["x-2-3-2-3-x"],
+            "C#°": ["x-4-5-4-5-x"],
+            "F#°": ["x-8-9-8-9-x"],
+            "G#°": ["4-x-6-5-6-x"], /// ~=Ab°
+            "A°": ["5-x-6-5-6-x"],
+            "B#°": ["x-3-2-0-1-0"], 
+
+            // Энгармонические варианты (Bb°, Db°, Eb°, Gb°/F#°)
+            // Используют те же формы, что и B°, C#°, D°, E° соответственно,
+            // но играются на другом ладу.
+            // Для удобства можно добавить их с теми же схемами, что и их "диезные" аналоги.
+            "Ab°": ["4-x-6-5-6-x"], /// ~=Ab°
+            "Bb°": ["x-1-2-1-2-1"], // Та же форма, что и B°, но на 1 ладу
+            "Db°": ["x-4-5-4-5-x"], // Та же форма, что и C#°, но на другом ладу
+            "Eb°": ["x-6-7-6-7-x"], // Та же форма, что и D°, но на другом ладу
+            "E#°": ["1-2-3-1-1-1", "x-8-9-10-9-x"],
+            "D#°": ["x-6-7-6-7-x"],
+            }
         };
+
 
         let output = document.getElementById("output");
         let input = document.getElementById("input");
@@ -217,6 +422,51 @@
           output.appendChild(line);
           scrollToBottom();
         }
+
+        // --- НОВАЯ ФУНКЦИЯ ПЕЧАТИ HTML ---
+        function printHTML(html) {
+             const line = document.createElement("div");
+             line.innerHTML = html + "<br/>";
+             output.appendChild(line);
+             scrollToBottom();
+         }
+
+            // Принимает МАССИВ схем (diagramsArray) и название аккорда (chordName)
+            function renderChordDiagram(diagramsArray, chordName) {
+                // Если массив схем пустой или не существует, ничего не рисуем или выводим сообщение
+                if (!diagramsArray || diagramsArray.length === 0) {
+                    return `<div style="color:#ff6666;">Схемы для ${chordName} не найдены</div>`;
+                }
+
+                let html = `<div class="chord-diagram">`;
+
+                // Добавляем название аккорда только один раз, над всеми схемами
+                html += `<div class="chord-name">${chordName}</div>`;
+                html += `<div class="chord-diagram-container">`;
+
+                // Проходим по КАЖДОЙ схеме в массиве
+                diagramsArray.forEach(diagram => {
+                    html += `<div class="chord-string">`; // Начало блока для одной схемы
+
+                    // Проходим по каждому символу в строке аппликатуры
+                    for (let j = 0; j < diagram.length; j++) {
+                        const char = diagram[j];
+                        if (char === 'x') {
+                            html += `<div class="chord-fret chord-fret-x">${char}</div>`;
+                        } else if (char === '0' || (!isNaN(char))) { // '0' или любая цифра
+                            html += `<div class="chord-fret">${char}</div>`;
+                        } else {
+                            // Для дефисов и других символов оставляем пустой бокс
+                            html += `<div class="chord-fret"></div>`;
+                        }
+                    }
+                    html += `</div>`; // Конец блока для одной схемы
+                });
+
+                html += `</div></div>`; // Конец контейнера и блока аккорда
+
+                return html;
+            }
 
         function getDimStep(keyName) {
           return keyName.includes("-dur") ? 7 : 2;
@@ -264,6 +514,9 @@
           [DOMINANT]: { [TONIC]: 5, [SUBDOMINANT]: 1, [DOMINANT]: 1 },
         };
 
+        
+        
+        
         function getChordFunction(step) {
           if ([1, 3, 6].includes(step)) return TONIC;
           if ([2, 4].includes(step)) return SUBDOMINANT;
@@ -442,7 +695,7 @@
         }
 
         print(NOTE + PIANO + " A-kordey / Аккорды " + GUITAR + NOTES);
-        print("Версия 2.0");
+        print("Версия 3.5");
         print("генератор последовательностей аккордов");
         print("by Dm.Isanin" + MICROPHONE);
         print("\n");
@@ -532,41 +785,32 @@
           print(" [⤶] по умолчанию выставляется минимальное значение: 3");
         }
 
-        // --- НОВАЯ ФУНКЦИЯ КАДАНСА ---
-        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ КАДАНСА С ПОДДЕРЖКОЙ ПОЛНОГО ФУНКЦИОНАЛЬНОГО ОБОРОТА ---
-        // --- УЛУЧШЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ КАДАНСА ---
+        // --- ГЕНЕРАЦИИ КАДАНСА С ПОДДЕРЖКОЙ ПОЛНОГО ФУНКЦИОНАЛЬНОГО ОБОРОТА ---
 
-        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ С ИСПОЛЬЗОВАНИЕМ КАДАНСА ---
-        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ГЕНЕРАЦИИ С ИСПОЛЬЗОВАНИЕМ КАДАНСА ---
-        function generate() {
+                function generate() {
             state = "askRepeat";
             let sequenceChords = [];
             let sequenceStepsArr = [];
             let currentStep = null;
-
-            // --- НОВАЯ ЛОГИКА: Выбор каданса ТОЛЬКО если он возможен ---
             let selectedCadenceInfo = null;
 
             if (forbidVtoIV) { 
                 const cadenceTypeIds = Object.keys(Vocabulary.cadenceTypes);
                 
-                // Создаем список всех возможных ступеней во всех кадансах
                 const allPossibleCadenceSteps = new Set();
                 for (let id of cadenceTypeIds) {
                     Vocabulary.cadenceTypes[id].templateSteps.forEach(step => allPossibleCadenceSteps.add(step));
                 }
 
-                // Проверяем, есть ли у пользователя аккорды для ВСЕХ этих ступеней
                 let canApplyCadence = true;
                 for (let step of allPossibleCadenceSteps) {
                     if (!selectedSteps.includes(step)) {
                         canApplyCadence = false;
-                        break; // Если хотя бы одной ступени нет - выходим
+                        break;
                     }
                 }
 
                 if (canApplyCadence) {
-                    // Только теперь, если проверка пройдена, выбираем случайный каданс
                     const randomId = cadenceTypeIds[Math.floor(Math.random() * cadenceTypeIds.length)];
                     selectedCadenceInfo = Vocabulary.cadenceTypes[randomId];
                     
@@ -576,7 +820,6 @@
                 }
             }
             
-            // --- ГЕНЕРАЦИЯ ПОСЛЕДОВАТЕЛЬНОСТИ ---
             while (sequenceChords.length < sequenceLength) {
                 let nextItem;
                 
@@ -586,14 +829,13 @@
                     nextItem = chooseNextChord(currentStep);
                 }
 
-                if (!nextItem) break; // Защита от зависания
+                if (!nextItem) break;
 
                 sequenceChords.push(nextItem.chord);
                 sequenceStepsArr.push(nextItem.step);
                 currentStep = nextItem.step;
             }
 
-            // --- ПРИМЕНЕНИЕ КАДАНСА (блок остается прежним, но выполнится только если selectedCadenceInfo не null) ---
             if (selectedCadenceInfo && forbidVtoIV) {
                 sequenceChords.splice(sequenceLength - selectedCadenceInfo.templateSteps.length);
                 sequenceStepsArr.splice(sequenceLength - selectedCadenceInfo.templateSteps.length);
@@ -616,18 +858,36 @@
                 }
             }
 
-            // Вывод результата
-            print("\n");
-            print("🎶 Ваша последовательность в тональности " + key + " 🎶");
-            for (let i = 0; i < sequenceChords.length; i += 4) {
-                print(sequenceChords.slice(i, i + 4).join(" "));
+            // --- НОВЫЙ БЛОК: Вывод уникальной последовательности ---
+            print("\n🎶 Ваша последовательность в тональности " + key + " 🎶");
+            // Выводим исходную последовательность с переносами строк
+            for (let i = 0; i < sequenceChords.length; i += 8) { // Увеличили длину строки до 8 для наглядности
+                print(sequenceChords.slice(i, i + 8).join(" "));
             }
 
-            // Сообщение о применённом кадансе выводим тоже только если он был применён
-            if (selectedCadenceInfo && forbidVtoIV) {
-                print(`\nПрименён каданс: ${selectedCadenceInfo.name} — ${selectedCadenceInfo.desc}`);
-            }
+            // Находим уникальные аккорды
+            const uniqueChordsObj = {};
+            sequenceChords.forEach(chordName => {
+                uniqueChordsObj[chordName] = true;
+            });
+            const uniqueChordsArray = Object.keys(uniqueChordsObj);
 
+            // Сортируем аккорды (опционально, для красивого вывода)
+            uniqueChordsArray.sort((a, b) => a.localeCompare(b));
+
+            // Выводим результат
+            print("\n" + GUITAR + " Используемые аппликатуры:");
+
+// Отрисовываем схемы для каждого уникального аккорда
+                uniqueChordsArray.forEach(chordName => {
+                    // Получаем МАССИВ всех схем для текущего аккорда из словаря
+                    const diagramsArray = Vocabulary.chordDiagrams[chordName];
+                    
+                    // Вызываем новую функцию, передавая ей массив схем и название аккорда
+                    printHTML(renderChordDiagram(diagramsArray, chordName));
+                });
+
+            // ... остальной код (вопрос о дальнейших действиях)
             print("\nЧто делаем дальше?");
             print(" ( 1 ) — 🔁 сгенерировать еще раз");
             print(" ( 2 ) — 🎹 выбрать другие аккорды");
