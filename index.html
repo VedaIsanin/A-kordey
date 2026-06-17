@@ -5,110 +5,108 @@
     <title>Генератор аккордов</title>
     <style>
       /* --- ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ --- */
-      body {
-        font-family: "Courier New", monospace;
-        padding: 20px;
-        background: #1e1e1e;
-        color: #d4d4d4;
-        margin: 0;
-        max-width: 960px; /* Ограничиваем ширину всего контента */
-        margin-left: auto;
-        margin-right: auto;
-      }
-      
-      #output {
-        white-space: pre-wrap;
-        line-height: 1.5;
-        margin-bottom: 15px;
-        min-height: 300px;
-        padding: 15px;
-        background: #2d2d2d;
-        border: 1px solid #444;
-        overflow-y: auto;
-        word-break: break-word; /* Разрешаем длинные слова переносить */
-      }
-
-      .input-line {
-        display: flex;
-        gap: 8px;
-        padding: 10px;
-        background: #2d2d2d;
-        border: 1px solid #444;
-      }
-
-      .prompt {
-        color: #4ec9b0;
-        font-size: 18px;
-        align-self: center;
-      }
-
-      #input {
-        flex: 1;
-        padding: 8px 12px;
-        font-family: "Courier New", monospace;
-        font-size: 15px;
-        background: #3c3c3c;
-        color: #fff;
-        border: none;
-      }
-
-      #input:focus {
-        outline: 2px solid #007acc;
-      }
-
-      /* --- НОВЫЕ СТИЛИ ДЛЯ ТАБЛИЦЫ ТОНАЛЬНОСТЕЙ --- */
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          text-align: left;
-          word-break: keep-all; /* Чтобы названия тональностей не рвались по буквам */
-      }
-
-      th, td {
-          padding: 8px;
-          border: 1px solid #444;
-          white-space: nowrap; /* Запрещаем перенос текста по умолчанию */
-          /*overflow: hidden;   /* Скрываем то, что выходит за границы */
-          text-overflow: ellipsis; /* Ставим троеточие ... если текст обрезан */
-      }
-
-      /* Стили для заголовков столбцов */
-      th {
-          background-color: #333;
-          font-weight: bold;
-      }
-
-      /* Стили для ячеек данных */
-      td {
-          background-color: #2d2d2d;
-      }
-
-      /* Показываем полный текст при наведении */
-      td:hover::after {
-          content: attr(data-full-text);
-          position: absolute;
-          background: #333;
-          border: 1px solid #555;
-          padding: 4px 8px;
-          z-index: 10;
-          white-space: normal; /* Позволяем тексту переноситься во всплывающей подсказке */
-          word-break: break-word;
-      }
-
-      /* --- СТИЛИ ДЛЯ ТАБУЛАТУР (без изменений) --- */
-      .chord-diagram-container {
-    /* display: flex; Убираем это */
-    /* flex-wrap: wrap; Убираем это */
-    /* gap: 8px; Убираем это */
-    /* justify-content: center; Убираем это */
-    
-            display: block; /* Добавляем это, чтобы каждый блок .chord-diagram был на новой строке */
-            margin-top: 5px; /* <-- Вот этот отступ создает пустое пространство после имени аккорда*/
-            text-align: left;
-            box-sizing: border-box;
+/* --- ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ --- */
+body {
+    font-family: "Courier New", monospace;
+    margin: 0; /* Это обнуление остается */
+    background: #1e1e1e;
+    color: #d4d4d4;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* область схемы аппликатуры аккорда (фоновый бокс)*/
+#output {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    min-height: 300px;
+    padding: 15px;
+    background: #2d2d2d;
+    border: 1px solid #444;
+    overflow-y: auto;
+    word-break: break-word;
+}
+
+.input-line {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background: #2d2d2d;
+    border: 1px solid #444;
+}
+
+.prompt {
+    color: #4ec9b0;
+    font-size: 18px;
+    align-self: center;
+}
+
+#input {
+    flex: 1;
+    padding: 8px 12px;
+    font-family: "Courier New", monospace;
+    font-size: 15px;
+    background: #3c3c3c;
+    color: #fff;
+    border: none;
+}
+
+#input:focus {
+    outline: 2px solid #007acc;
+}
+
+/* --- НОВЫЕ СТИЛИ ДЛЯ ТАБЛИЦЫ ТОНАЛЬНОСТЕЙ --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    word-break: keep-all;
+}
+
+th, td {
+    padding: 8px;
+    border: 1px solid #444;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Ставим троеточие ... если текст обрезан */
+}
+
+th {
+    background-color: #333;
+    font-weight: bold;
+}
+
+td {
+    background-color: #2d2d2d;
+}
+
+td {
+    cursor: help; /* Меняем курсор на знак вопроса */
+}
+
+td:hover::after {
+    content: "👈" attr(data-full-text);
+    position: absolute;
+    background: #252526;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 6px 10px;
+    z-index: 100;
+    color: #d4d4d4;
+    font-size: 14px;
+    font-family: "Courier New", monospace;
+    white-space: normal;
+    word-break: break-word;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* --- СТИЛИ ДЛЯ ТАБУЛАТУР (с изменениями) --- */
+.chord-diagram-container {
+    display: block; /* Каждый блок на новой строке */
+    margin-top: 5px;
+    text-align: left;
+}
+
 .chord-diagram {
     display: flex;
     flex-direction: column;
@@ -119,57 +117,103 @@
     border: 2px solid #555;
     border-radius: 4px;
     padding: 8px;
-    width: fit-content;
-    max-width: 300px; /* Новая ширина, достаточная для 6 струн */
-    margin-right: 10px;
-    box-sizing: border-box;
-    min-height: 70px; /* Уменьшаем высоту */
+    width: fit-content; /* Ширина по содержимому */
+    max-width: 300px; /* Новая ширина */
+    margin-right: 10px; /* Отступ справа для нескольких схем */
+    box-sizing: border-box; /* Включаем padding в общую ширину */
 }
 
 .chord-name {
     font-weight: bold;
-    /*margin-bottom: -6px; /* Это значение создает отступ  до аппликатуры*/
     text-align: center;
 }
 
 .chord-string {
     display: flex;
     align-items: center; /* Выравниваем по центру по вертикали */
-    margin-bottom: -3px;
 }
 
-/* Компактный бокс для лада */
-.chord-fret {
-    
-    display: flex; /* Включаем контекст для центрирования */
-    justify-content: center; /* Центрируем по горизонтали */
-    align-items: center; /* Центрируем по вертикали */
-    
-    width: 11px; /* Увеличиваем ширину каждого бокса */
-    height: 18px; /* Фиксированная высота бокса */
-    
-    margin-right: 2px; /* Отступ между боксами */
-    
-    font-weight: bold;
-    font-size: 12px; /* Маленький, но читаемый шрифт */
-    
-    /* --- НОВЫЕ СВОЙСТВА ДЛЯ РЕШЕНИЯ ПРОБЛЕМЫ --- */
-    /*overflow: hidden; /* Отрезаем всё, что выходит за границы бокса */
-    /*text-overflow: ellipsis; /* (Опционально) Ставит троеточие, если текст отрезается */
+/* --- НОВЫЕ СТИЛИ ДЛЯ РАВНОГО РАЗМЕРА БОКСОВ (ключевое изменение) --- */
+.chord-diagram .chord-string {
+     margin-bottom: -3px; /* Убирает зазор между строками схемы */
 }
 
-.chord-fret-x {
-    color: red;
-    width: 10px; /* Увеличиваем ширину каждого бокса */
-    font-size: 14px; /* Чуть крупнее для 'x' */
+.chord-diagram .chord-fret,
+.chord-diagram .chord-fret-x {
+     display: flex; /* Для центрирования содержимого */
+     justify-content: center;
+     align-items: center;
+     width: 11px; /* Единая ширина для всех боксов */
+     height: 18px; /* Единая высота */
+     margin-right: 2px; /* Отступ между боксами */
+     font-weight: bold;
+     font-size: 12px; /* Единый размер шрифта */
+     box-sizing: border-box; /* Чтобы padding не влиял на размер */
+ }
+
+/* Стиль для крестика (теперь наследует размер) */
+.chord-diagram .chord-fret-x {
+     color: red; /* Красный цвет для 'x' остается */
+ }
+
+/* Выводим содержимое бокса через псевдоэлемент, чтобы сам бокс не менял размер */
+.chord-diagram .chord-fret {
+     font-size: 0; /* Обнуляем шрифт у контейнера */
+ }
+
+.chord-diagram .chord-fret::before {
+     content: attr(data-content); /* Берем текст из атрибута data-content */
+     font-size: 12px; /* Задаем нужный размер шрифта здесь */
+     line-height: 18px; /* Центрируем по вертикали (равно высоте бокса) */
+ }
+
+/* --- СТИЛИ ДЛЯ ФОРМЫ С ЧЕКБОКСАМИ (без изменений) --- */
+#chord-checkboxes {
+   display: flex;
+   flex-direction: column;
+   gap: 2px;
+   line-height: 1;
 }
 
-      .chord-string-line {
-          width: 100%;
-          height: 2px;
-          background-color: #fff;
-          flex-grow: 1;
-      }
+.chord-checkbox {
+   display: flex;
+   align-items: center;
+   gap: 6px;
+   margin-bottom: 0; /* Главная правка для чекбоксов */
+}
+
+.chord-checkbox input[type="checkbox"] {
+   transform: translateY(-8px);
+   position: relative;
+}
+
+/* --- НОВЫЕ СТИЛИ ДЛЯ КНОПОК (без изменений) --- */
+button,
+.select-all-btn,
+.deselect-all-btn,
+.chord-button-group[type="submit"] {
+   font-family: "Courier New", monospace;
+   font-size: 15px;
+   color: #d4d4d4;
+   background-color: #3c3c3c; /* Темно-серый фон */
+   border-radius: 4px; /* Скругленные углы */
+   border-style:solid; border-width :1px; border-color:#444 ;
+   padding-top :6px ; padding-bottom :6px ; padding-left :12px ; padding-right :12px ;
+   margin-top :2px ; margin-bottom :2px ;
+   cursor :pointer ;
+   transition-duration :0.2s ;
+}
+
+button.select-all-btn,
+button.deselect-all-btn,
+button[type="submit"] {
+   margin-left :0 !important ;
+   margin-right :8px ;
+}
+
+button.hover-state { transition-property :background-color , border-color ; }
+button.hover-state.hover { background-color:#4ec9b0 ; color:#1e1e1e ; border-color:#4ec9b0 ; }
+button.hover-state.active { background-color:#007acc ; transform :translateY(1px) ; }
     </style>
 
   </head>
@@ -201,7 +245,7 @@
         const DRUM = "\u{1F941}"; // 🥁
 
         // Прочее
-        const MICROPHONE = "\u{1F4A4}"; // 🎤
+        const MICROPHONE = "🎤"; // 🎤
         const HEADPHONES = "\u{1F3A7}"; // 🎧
         const RADIO = "\u{1F4FB}"; // 📻
 
@@ -361,11 +405,13 @@
             "E#m": ["1-3-3-1-1-1", "x-x-3-5-4-6", "x-7-9-9-8-7"],
             "F#m": ["2-4-4-2-2-2", "x-9-11-11-10-9"],
             "C#m": ["x-4-6-6-5-4", "9-11-11-9-9-9"],
+            
+            "Dbm": ["x-4-6-6-5-4", "9-11-11-9-9-9"],
+            "Ebm": ["x-6-8-8-8-6", "x-6-8-8-7-6"],
+            "Bbm": ["x-1-3-3-2-1", "6-8-8-6-6-6"],
 
             // Миноры с бемолем (добавлены)
             "G#m": ["4-6-6-4-4-4", "x-11-13-13-12-11"],
-            "Ebm": ["x-6-8-8-8-6", "x-6-8-8-7-6"], // Использует форму Eb мажора с изменением одной ноты
-            "Bbm": ["x-1-3-3-2-1", "6-8-8-6-6-6"], // ДОБАВЛЕНО: Классическая и баррэ аппликатура
             "A#m": ["x-1-3-3-2-1", "6-8-8-6-6-6"], // Энгармонизм Bbm
             "D#m": ["x-6-8-8-7-6", "x-6-8-8-7-8"], // Энгармонизм Ebm
 
@@ -376,15 +422,20 @@
             "C°": ["x-3-2-0-1-0"],
             "D°": ["x-5-6-5-6-x"],
             "E°": ["0-7-6-7-x-x"],
+            "F°": [
+                "x-8-7-6-8-x", // Вариант 1 (на 8 ладу)
+                "1-2-3-1-x-x", // Вариант 2 (на 1-3 ладах)
+                "x-x-3-1-2-1"  // Вариант 3 (на 1-3 ладах)
+            ],
             "G°": ["3-x-6-5-6-x"],
-            "A#°": ["x-1-2-1-2-1"],
 
             // Базовая аппликатура для B°, C#°, F#° и A°
+            "A°": ["5-x-6-5-6-x"],
             "B°": ["x-2-3-2-3-x"],
+            "A#°": ["x-1-2-1-2-1"],
             "C#°": ["x-4-5-4-5-x"],
             "F#°": ["x-8-9-8-9-x"],
             "G#°": ["4-x-6-5-6-x"], /// ~=Ab°
-            "A°": ["5-x-6-5-6-x"],
             "B#°": ["x-3-2-0-1-0"], 
 
             // Энгармонические варианты (Bb°, Db°, Eb°, Gb°/F#°)
@@ -411,11 +462,39 @@
         let sequenceLength = 4;
         let forbidVtoIV = true;
 
+        // --- НОВЫЙ СЛУШАТЕЛЬ КЛИКОВ ДЛЯ ФОКУСА ---
+        // Этот код заменяет старый простой слушатель.
+        // Он проверяет, был ли клик внутри блока #output (где находится таблица).
+        // Если клик был НЕ в #output, он переводит фокус на инпут.
+          output.addEventListener("click", function(event) {
+            // Проверяем, что кликнули именно по кнопке
+            if (event.target && event.target.tagName === "BUTTON") {
+                // Получаем значение из атрибута data-action
+                const action = event.target.getAttribute("data-action");
+                if (action) {
+                    // Вызываем основную функцию handle с этим значением
+                    handle(action);
+                }
+            }
+        });
+
         // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
         function scrollToBottom() {
           window.scrollTo(0, document.body.scrollHeight);
           output.scrollTop = output.scrollHeight;
         }
+
+        // --- НОВАЯ ФУНКЦИЯ ДЛЯ КНОПОК "ВЫБРАТЬ ВСЕ" / "СНЯТЬ ВСЕ" ---
+        function toggleAllCheckboxes(shouldCheck) {
+            // Находим все элементы <input type="checkbox"> внутри блока #chord-checkboxes
+            const checkboxes = document.querySelectorAll('#chord-checkboxes input[type="checkbox"]');
+            
+            // Проходим по каждому найденному чекбоксу
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = shouldCheck; // Устанавливаем его состояние
+            });
+        }
+
         function print(text) {
           const line = document.createElement("div");
           line.textContent = text + "\n";
@@ -432,41 +511,45 @@
          }
 
             // Принимает МАССИВ схем (diagramsArray) и название аккорда (chordName)
-            function renderChordDiagram(diagramsArray, chordName) {
-                // Если массив схем пустой или не существует, ничего не рисуем или выводим сообщение
-                if (!diagramsArray || diagramsArray.length === 0) {
-                    return `<div style="color:#ff6666;">Схемы для ${chordName} не найдены</div>`;
-                }
+// Принимает МАССИВ схем (diagramsArray) и название аккорда (chordName)
+function renderChordDiagram(diagramsArray, chordName) {
+    // Если массив схем пустой или не существует, ничего не рисуем или выводим сообщение
+    if (!diagramsArray || diagramsArray.length === 0) {
+        return `<div style="color:#ff6666;">Схемы для ${chordName} не найдены</div>`;
+    }
 
-                let html = `<div class="chord-diagram">`;
+    let html = `<div class="chord-diagram">`;
 
-                // Добавляем название аккорда только один раз, над всеми схемами
-                html += `<div class="chord-name">${chordName}</div>`;
-                html += `<div class="chord-diagram-container">`;
+    // Добавляем название аккорда только один раз, над всеми схемами
+    html += `<div class="chord-name">${chordName}</div>`;
+    html += `<div class="chord-diagram-container">`;
 
-                // Проходим по КАЖДОЙ схеме в массиве
-                diagramsArray.forEach(diagram => {
-                    html += `<div class="chord-string">`; // Начало блока для одной схемы
+    // Проходим по КАЖДОЙ схеме в массиве
+    diagramsArray.forEach(diagram => {
+        html += `<div class="chord-string">`; // Начало блока для одной схемы
 
-                    // Проходим по каждому символу в строке аппликатуры
-                    for (let j = 0; j < diagram.length; j++) {
-                        const char = diagram[j];
-                        if (char === 'x') {
-                            html += `<div class="chord-fret chord-fret-x">${char}</div>`;
-                        } else if (char === '0' || (!isNaN(char))) { // '0' или любая цифра
-                            html += `<div class="chord-fret">${char}</div>`;
-                        } else {
-                            // Для дефисов и других символов оставляем пустой бокс
-                            html += `<div class="chord-fret"></div>`;
-                        }
-                    }
-                    html += `</div>`; // Конец блока для одной схемы
-                });
+        // Проходим по каждому символу в строке аппликатуры
+        for (let j = 0; j < diagram.length; j++) {
+            const char = diagram[j];
 
-                html += `</div></div>`; // Конец контейнера и блока аккорда
-
-                return html;
+            if (char === 'x') {
+                // Для крестика используем класс .chord-fret-x, но сам символ вставим через CSS
+                html += `<div class="chord-fret chord-fret-x" data-content="x"></div>`;
+            } else if (char === '0' || (!isNaN(char))) { // '0' или любая цифра
+                // Для цифр используем обычный .chord-fret
+                html += `<div class="chord-fret" data-content="${char}"></div>`;
+            } else {
+                // Для дефисов '-' и других символов оставляем пустой бокс с нужным размером
+                html += `<div class="chord-fret" data-content="${char}"></div>`;
             }
+        }
+        html += `</div>`; // Конец блока для одной схемы
+    });
+
+    html += `</div></div>`; // Конец контейнера и блока аккорда
+
+    return html;
+}
 
         function getDimStep(keyName) {
           return keyName.includes("-dur") ? 7 : 2;
@@ -574,9 +657,9 @@
             scrollToBottom();
           }
         });
-        document.addEventListener("click", function () {
-          input.focus();
-        });
+        // document.addEventListener("click", function () {
+        //   input.focus();
+        // });
 
         function handle(userInput) {
           if (userInput) {
@@ -586,6 +669,23 @@
 
           if (state === "chooseKeyNum") {
             const choice = userInput.trim();
+
+                        // --- НОВАЯ ЛОГИКА ДЛЯ ВЫБОРА В ОДИН КЛИК ---
+                        if (choice.includes(",")) {
+              const [choiceNum, mode] = choice.split(",");
+              const numericChoice = parseInt(choiceNum);
+              const majors = Vocabulary.keyPairs.map((p) => p[0]);
+              const minors = Vocabulary.keyPairs.map((p) => p[1]);
+
+              if (!isNaN(numericChoice) && numericChoice >= 1 && numericChoice <= majors.length) {
+                keyIdx = numericChoice - 1;
+                // Сразу выбираем тональность на основе mode ('maj' или 'min')
+                key = mode === 'maj' ? majors[keyIdx] : minors[keyIdx];
+                // И сразу переходим к следующему шагу, минуя 'chooseKeyType'
+                chooseChords();
+                return; // Важно выйти из функции, чтобы не выполнился код ниже
+              }
+            }
 
             // --- НОВАЯ ЛОГИКА ДЛЯ ВВОДА "00" ---
             if (choice === "00") {
@@ -633,22 +733,40 @@
               chooseChords(); // Сразу переходим к выбору аккордов
             } else {
               // Старая логика для ручного ввода номера
-              const numericChoice = parseInt(choice);
-              const majors = Vocabulary.keyPairs.map((p) => p[0]);
+            // Новая логика для ручного ввода номера или случайного выбора
+            const numericChoice = parseInt(choice);
+            const majors = Vocabulary.keyPairs.map((p) => p[0]);
 
-              if (
-                !isNaN(numericChoice) &&
-                numericChoice >= 1 &&
-                numericChoice <= majors.length
-              ) {
-                keyIdx = numericChoice - 1;
-                print("🎭 Мажор (M)/[⤶] или минор (m): ");
-                state = "chooseKeyType";
-              } else {
-                print("Неверный выбор. Используется C-dur");
-                key = majors[0];
-                chooseChords();
-              }
+            if (!isNaN(numericChoice)) {
+                if (numericChoice === 0) {
+                    // --- ЛОГИКА ДЛЯ СЛУЧАЙНОГО ВЫБОРА ---
+                    print("🎲 Выбор тональности был доверен случаю. Что же достанется вам на этот раз?");
+                    print("\n"); // Добавляем перенос для красоты
+
+                    // Генерируем случайный номер строки от 1 до 15
+                    keyIdx = Math.floor(Math.random() * 15);
+                    // Генерируем случайное число 0 или 1 для выбора лада (0 - мажор, 1 - минор)
+                    const randomMode = Math.round(Math.random());
+                    // Выбираем тональность напрямую из массива пар
+                    key = Vocabulary.keyPairs[keyIdx][randomMode];
+
+                    // Сразу переходим к выбору аккордов
+                    chooseChords();
+                    return; // ВАЖНО: выходим из функции handle
+
+                } else if (numericChoice >= 1 && numericChoice <= majors.length) {
+                    // Логика для выбора конкретной строки (1-15)
+                    keyIdx = numericChoice - 1;
+                    print("🎭 Мажор (M)/[⤶] или минор (m): ");
+                    state = "chooseKeyType";
+                } else {
+                    print("Неверный выбор. Используется C-dur");
+                    key = majors[0];
+                    chooseChords();
+                }
+            } else {
+                print("Неверный ввод. Пожалуйста, введите число от 0 до 15.");
+            }
             }
           } else if (state === "chooseKeyType") {
             const answerType = userInput.trim();
@@ -697,8 +815,8 @@
         print(NOTE + PIANO + " A-kordey / Аккорды " + GUITAR + NOTES);
         print("Версия 3.6");
         print("генератор последовательностей аккордов");
-        print("by Dm.Isanin" + MICROPHONE);
-        print("\n");
+        print("by Dm.Isanin 🤘");
+        print("\nЭто веб-приложение принимает от вас простые текстовые команды от 1-9 и M/m по нажатии Enter");
         print("По 7 базовых аккордов есть в каждой тональности.");
         print(
           'В современной музыке 24 тональности. У шести из тональностей есть по одной сестре-"синониму" (см. 5' +
@@ -719,51 +837,193 @@
         print("\n");
 
         function start() {
-          state = "chooseKeyNum";
+            state = "chooseKeyNum";
+            output.innerHTML = ""; // Полностью очищаем блок вывода
 
-          print("_________________");
-          print("🎼 Шаг 1. Выбор тональности.\n");
-          print("    № | Мажор (M)      | минор (m)      | Ключевые знаки");
-          print("------|----------------|----------------|-----------------");
-          Vocabulary.keyPairs.forEach((pair, i) => {
-            const maj = pair[0];
-            const min = pair[1];
-            const sig = Vocabulary.keySignatures[maj] || "?";
-            print(
-              (i + 1).toString().padStart(5) +
-                " | " +
-                maj.padEnd(15) +
-                "| " +
-                min.padEnd(15) +
-                "| " +
-                sig
-            );
-          });
-          print("\n⌨️ Введите: __ ");
-          print(" (  Enter ) [⤶] для выбора C-dur");
-          print(" ( 1 - 15 ) 🔢 номер строки от 1 до 15");
-          print(" (    0   ) 🚀 для быстрого выбора случайной тональности 🎲");
-          print(
-            ' (   00   ) ⚡️ для быстрой генерации "случайной" последовательности 🎲'
-          );
-          input.focus();
+            print(NOTE + PIANO + " A-kordey / Аккорды " + GUITAR + NOTES);
+            print("Версия 3.6");
+            print("генератор последовательностей аккордов");
+            print("by Dm.Isanin 🤘");
+            print("\nЭто веб-приложение принимает от вас простые текстовые команды от 1-9 и M/m по нажатии Enter");
+            print("По 7 базовых аккордов есть в каждой тональности.");
+            print('В современной музыке 24 тональности. У шести из тональностей есть по одной сестре-"синониму" (см. 5' + SHARP + "=7" + FLAT + ", 7" + SHARP + "=5" + FLAT + " и 6" + SHARP + "=6" + FLAT + ")");
+            print("В таблице ниже представлены все они и их ключевые знаки.");
+            print("\n");
+
+            // --- СОЗДАНИЕ ТАБЛИЦЫ ---
+            const tableContainer = document.createElement('div');
+            const table = document.createElement('table'); // Создаем элемент таблицы
+            table.id = "tonalities-table"; // Задаем ID для удобства
+            table.style.width = "100%"; // Применяем стили напрямую
+            table.style.borderCollapse = "collapse";
+
+            // 1. Создаем и добавляем строку заголовка
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            ["№", "Мажор (M)", "Минор (m)", "Ключевые знаки"].forEach(text => {
+                const th = document.createElement("th");
+                th.textContent = text;
+                th.style.backgroundColor = "#333";
+                th.style.color = "#d4d4d4";
+                th.style.fontWeight = "bold";
+                th.style.padding = "8px";
+                th.style.border = "1px solid #444";
+                th.style.textAlign = "left";
+                headerRow.appendChild(th);
+            });
+
+            // 2. Создаем тело таблицы и заполняем его строками
+            const tbody = document.createElement("tbody");
+            Vocabulary.keyPairs.forEach((pair, i) => {
+                const maj = pair[0];
+                const min = pair[1];
+                const sig = Vocabulary.keySignatures[maj] || "?";
+                const rowNum = i + 1;
+
+                const row = tbody.insertRow();
+
+                // Ячейка с номером
+                const numCell = row.insertCell(0);
+                numCell.textContent = rowNum;
+                numCell.style.border = "1px solid #444";
+                numCell.style.padding = "8px";
+
+                // Ячейка с мажорной тональностью
+                const majCell = row.insertCell(1);
+                majCell.textContent = maj;
+                majCell.style.border = "1px solid #444";
+                majCell.style.padding = "8px";
+                majCell.style.whiteSpace = "nowrap"; // Запрет переноса
+
+                // Ячейка с минорной тональностью
+                const minCell = row.insertCell(2);
+                minCell.textContent = min;
+                minCell.style.border = "1px solid #444";
+                minCell.style.padding = "8px";
+                minCell.style.whiteSpace = "nowrap";
+
+                // Ячейка с ключевыми знаками
+                const sigCell = row.insertCell(3);
+                sigCell.textContent = sig;
+                sigCell.style.border = "1px solid #444";
+                sigCell.style.padding = "8px";
+
+                // --- ДОБАВЛЯЕМ ИНТЕРАКТИВНОСТЬ И ВСПЛЫВАЮЩУЮ ПОДСКАЗКУ ---
+                // Добавляем атрибут для всплывающей подсказки к ячейкам с названиями
+                majCell.setAttribute('data-full-text', maj);
+                minCell.setAttribute('data-full-text', min);
+
+                // Делаем всю строку фокусируемой и кликабельной
+                row.setAttribute('tabindex', '0');
+
+                // Обработчик клика на всю строку (выбирает Мажор)
+                row.addEventListener('click', function() {
+                    handle(`${rowNum},maj`);
+                });
+
+                // Обработчик клика на ячейку Минор (выбирает Минор)
+                minCell.addEventListener('click', function(event) {
+                    event.stopPropagation(); // Чтобы не сработал обработчик на строке
+                    handle(`${rowNum},min`);
+                });
+            });
+
+            // Собираем таблицу воедино (thead + tbody)
+            table.appendChild(thead);
+            table.appendChild(tbody);
+
+            // Добавляем готовую таблицу в контейнер и выводим на экран
+            tableContainer.appendChild(table);
+            output.appendChild(tableContainer);
+
+            print("\nКликните по названию тональности, чтобы выбрать её.");
+            print("Вы также можете использовать кнопки:");
+            printHTML(`<button data-action="00">⚡️ Быстрая генерация</button>`);
+            printHTML(`<button data-action="0">🎲 Случайная тональность</button>`);
+
+            input.focus();
         }
 
         function chooseChords() {
-          state = "chooseChords";
-          const chordsInKey = Vocabulary.allChords[key];
-          print("Выбрана тональность: " + key + "\n");
-          print("_________________");
-          print("🎹 Шаг 2. Выберите аккорды для генерации.\n");
-          print("Доступные аккорды в тональности " + key + ":\n");
-          chordsInKey.forEach((c, i) => print(i + 1 + ". " + c));
-          print("\n⌨️Введите: __ ");
-          print(" [⤶] Enter для выбора всех кроме уменьшённого (°)");
-          print(" 0️⃣ для выбора всех");
-          print(
-            " 🔢 номера выбираемых аккордов (например, самых \"блатных\": '145'), разделитель не обязателен\n"
-          );
-          input.focus();
+            state = "chooseChords";
+            const chordsInKey = Vocabulary.allChords[key];
+
+            print("Выбрана тональность: " + key + "\n");
+            print("_________________");
+            print("🎹 Шаг 2. Выберите аккорды для генерации.\n");
+
+            let formHTML = `
+                <form id="chord-selection-form">
+                    <div id="chord-checkboxes">
+            `;
+
+            chordsInKey.forEach((c, i) => {
+                formHTML += `
+                    <label class="chord-checkbox">
+                        <input type="checkbox" name="chord" value="${i + 1}" checked> ${i + 1}. ${c}
+                    </label>
+                `;
+            });
+
+            formHTML += `
+                    <div class="input-line">
+                        <span class="prompt"></span> <!-- Пустой prompt, чтобы сохранить стиль -->
+                        <button type="button" class="select-all-btn">Выбрать все</button>
+                        <button type="button" class="deselect-all-btn">Снять выделение</button>
+                        <button type="submit" class="ready-btn">Готово</button>
+                    </div>
+            `;
+
+            printHTML(formHTML);
+
+            // --- НОВОЕ: Привязываем обработчики событий с помощью addEventListener ---
+            // Это нужно делать после того, как форма была добавлена на страницу.
+
+            // Находим кнопки
+            const selectAllBtn = document.querySelector('.select-all-btn');
+            const deselectAllBtn = document.querySelector('.deselect-all-btn');
+            const form = document.getElementById('chord-selection-form');
+
+            // Привязываем к ним функции
+            if (selectAllBtn) {
+                selectAllBtn.addEventListener('click', function() {
+                    toggleAllCheckboxes(true);
+                });
+            }
+
+            if (deselectAllBtn) {
+                deselectAllBtn.addEventListener('click', function() {
+                    toggleAllCheckboxes(false);
+                });
+            }
+
+            // Обработчик для кнопки "Готово"
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const selected = Array.from(document.querySelectorAll('#chord-selection-form input[type="checkbox"]:checked'))
+                                        .map(cb => cb.value);
+
+                    if (selected.length === 0) {
+                        selected.push(...Array.from({length: chordsInKey.length}, (_, i) => (i+1).toString()));
+                    }
+
+                    handle(selected.join(''));
+                });
+            }
+        }
+
+                // Вспомогательная функция для выбора аккордов по клику на кнопку
+        function selectChord(index) {
+            const chordsInKey = Vocabulary.allChords[key];
+            if (index === 0) {
+                handle("0"); // Передаем "0" для выбора всех, включая уменьшённый
+            } else if (index === undefined) {
+                handle(""); // Передаем пустую строку для выбора всех, кроме уменьшённого
+            } else {
+                // Если нажата кнопка конкретного аккорда, передаем его номер
+                handle(index.toString());
+            }
         }
 
         function askVtoIV() {
@@ -771,32 +1031,37 @@
           print("_________________");
           print("⚙️ Шаг 3. Режим генерации");
           print("\n⌨️ Введите: __ ");
-          print(
+          /*print(
             " ( 1 ) или [⤶] 📐 Соблюдать законы теории функций из муз. гармонии (заканчивать кадансом, запрет перехода V -> IV)"
           );
-          print(" ( 2 ) 🎨 Создать цепочку аккордов в свободном стиле\n");
+          print(" ( 2 ) 🎨 Создать цепочку аккордов в свободном стиле\n");*/
+          printHTML(`<button data-action="1">Да 📐 (заканчивать кадансом)</button>`);
+          printHTML(`<button data-action="2">Нет 🎨 (свободный стиль)</button>`);
         }
 
         function askCount() {
-          state = "askCount";
-          print("_________________");
-          print("📏 Шаг 4. Длина последовательности");
-          print(" 🔢 Укажите число аккордов в последовательности: __ ");
-          print(" [⤶] по умолчанию выставляется минимальное значение: 3");
+            state = "askCount";
+            print("_________________");
+            print("📏 Шаг 4. Длина последовательности");
+            
+            // Заменяем ввод на кнопки с цифрами
+            for (let i = 3; i <= 8; i++) { // Создаем кнопки от 3 до 8 аккордов
+                printHTML(`<button data-action="handle('${i}')">${i} аккорда(ов)</button>`);
+            }
         }
 
         // --- ГЕНЕРАЦИИ КАДАНСА С ПОДДЕРЖКОЙ ПОЛНОГО ФУНКЦИОНАЛЬНОГО ОБОРОТА ---
 
-                function generate() {
+        function generate() {
             state = "askRepeat";
             let sequenceChords = [];
             let sequenceStepsArr = [];
             let currentStep = null;
             let selectedCadenceInfo = null;
 
-            if (forbidVtoIV) { 
+            if (forbidVtoIV) {
                 const cadenceTypeIds = Object.keys(Vocabulary.cadenceTypes);
-                
+
                 const allPossibleCadenceSteps = new Set();
                 for (let id of cadenceTypeIds) {
                     Vocabulary.cadenceTypes[id].templateSteps.forEach(step => allPossibleCadenceSteps.add(step));
@@ -813,16 +1078,16 @@
                 if (canApplyCadence) {
                     const randomId = cadenceTypeIds[Math.floor(Math.random() * cadenceTypeIds.length)];
                     selectedCadenceInfo = Vocabulary.cadenceTypes[randomId];
-                    
+
                 } else {
                     print("\n⚠️ Для применения кадансов необходимо выбрать аккорды, соответствующие всем возможным ступеням (I, IV, V, VI, VII).");
                     print("Будет сгенерирована свободная последовательность без каданса.\n");
                 }
             }
-            
+
             while (sequenceChords.length < sequenceLength) {
                 let nextItem;
-                
+
                 if (currentStep === null) {
                     nextItem = chooseNextChord(null);
                 } else {
@@ -836,9 +1101,12 @@
                 currentStep = nextItem.step;
             }
 
+            // Применяем каданс в конце, если он был выбран
             if (selectedCadenceInfo && forbidVtoIV) {
-                sequenceChords.splice(sequenceLength - selectedCadenceInfo.templateSteps.length);
-                sequenceStepsArr.splice(sequenceLength - selectedCadenceInfo.templateSteps.length);
+                // Отрезаем последние аккорды, чтобы заменить их кадансом
+                // Используем .length, чтобы точно отрезать от конца текущей последовательности
+                sequenceChords.splice(sequenceChords.length - selectedCadenceInfo.templateSteps.length);
+                sequenceStepsArr.splice(sequenceStepsArr.length - selectedCadenceInfo.templateSteps.length);
 
                 for (let stepNum of selectedCadenceInfo.templateSteps) {
                     const indexInSelected = selectedSteps.indexOf(stepNum);
@@ -858,42 +1126,42 @@
                 }
             }
 
-            // --- НОВЫЙ БЛОК: Вывод уникальной последовательности ---
+            // --- БЛОК ВЫВОДА РЕЗУЛЬТАТОВ ---
+
+            // 1. Выводим сгенерированную последовательность аккордов
             print("\n🎶 Ваша последовательность в тональности " + key + " 🎶");
-            // Выводим исходную последовательность с переносами строк
-            for (let i = 0; i < sequenceChords.length; i += 8) { // Увеличили длину строки до 8 для наглядности
+            for (let i = 0; i < sequenceChords.length; i += 8) {
                 print(sequenceChords.slice(i, i + 8).join(" "));
             }
 
-            // Находим уникальные аккорды
-            const uniqueChordsObj = {};
-            sequenceChords.forEach(chordName => {
-                uniqueChordsObj[chordName] = true;
-            });
-            const uniqueChordsArray = Object.keys(uniqueChordsObj);
+            // 2. Находим уникальные аккорды для вывода аппликатур
+            const uniqueChordsArray = [...new Set(sequenceChords)].sort((a, b) => a.localeCompare(b));
 
-            // Сортируем аккорды (опционально, для красивого вывода)
-            uniqueChordsArray.sort((a, b) => a.localeCompare(b));
+            // 3. Выводим информацию о примененном кадансе (если он был)
+            if (selectedCadenceInfo && forbidVtoIV) {
+                print(`\n🎼 Применён каданс: ${selectedCadenceInfo.name} (${selectedCadenceInfo.desc})`);
+            }
 
-            // Выводим результат
-            print("\n" + GUITAR + " Используемые аппликатуры:");
-
-// Отрисовываем схемы для каждого уникального аккорда
+            // 4. Выводим аппликатуры для уникальных аккордов
+            if (uniqueChordsArray.length > 0) {
+                print("\n" + GUITAR + " Используемые аппликатуры:");
                 uniqueChordsArray.forEach(chordName => {
-                    // Получаем МАССИВ всех схем для текущего аккорда из словаря
                     const diagramsArray = Vocabulary.chordDiagrams[chordName];
-                    
-                    // Вызываем новую функцию, передавая ей массив схем и название аккорда
                     printHTML(renderChordDiagram(diagramsArray, chordName));
                 });
+            // Выводим из кэша
+                /* printHTML(chordDiagramCache[chordName]); */
+            }
 
-            // ... остальной код (вопрос о дальнейших действиях)
+
+
+            // 5. Задаем вопрос о дальнейших действиях
             print("\nЧто делаем дальше?");
             print(" ( 1 ) — 🔁 сгенерировать еще раз");
             print(" ( 2 ) — 🎹 выбрать другие аккорды");
             print(" ( 3 ) — 🎼 выбрать другую тональность");
             print(" Ctrl+R — обновить страницу");
-            
+
             print("\nВаш выбор: __ ");
         }
 
