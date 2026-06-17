@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
-	<head>
-		<meta charset="UTF-8"/>
-		<title>Генератор аккордов</title>
-		<style>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Генератор аккордов</title>
+    <style>
       /* --- ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ --- */
 /* --- ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ --- */
 body {
@@ -259,14 +259,16 @@ button,
     outline: none; /* Убираем обводку в Firefox при клике */
   }
     </style>
-	</head>
-	<body>
-		<div id="output"/>
-		<div class="input-line">
-			<span class="prompt">></span>
-			<input type="text" id="input" autocomplete="off"/>
-		</div>
-		<script>
+
+  </head>
+  <body>
+    <div id="output"></div>
+    <div class="input-line">
+      <span class="prompt">></span
+      ><input type="text" id="input" autocomplete="off" />
+    </div>
+
+    <script>
         let isCollapsed = true; // Изначально блок свёрнут
 
 function toggleIntro() {
@@ -596,20 +598,24 @@ function renderChordDiagram(diagramsArray, chordName) {
         html += `<div class="chord-string">`; // Начало блока для одной схемы
 
         // Проходим по каждому символу в строке аппликатуры
-        for (let j = 0; j < diagram.length; j++) { const char=diagram[j]; if (char==='x' ) { Для крестика используем класс .chord-fret-x, но сам символ вставим через CSS html +=`<div class="chord-fret chord-fret-x" data-content="x"/>`;
+        for (let j = 0; j < diagram.length; j++) {
+            const char = diagram[j];
+
+            if (char === 'x') {
+                // Для крестика используем класс .chord-fret-x, но сам символ вставим через CSS
+                html += `<div class="chord-fret chord-fret-x" data-content="x"></div>`;
             } else if (char === '0' || (!isNaN(char))) { // '0' или любая цифра
                 // Для цифр используем обычный .chord-fret
-                html += `<div class="chord-fret" data-content="${char}"/>`;
+                html += `<div class="chord-fret" data-content="${char}"></div>`;
             } else {
                 // Для дефисов '-' и других символов оставляем пустой бокс с нужным размером
-                html += `<div class="chord-fret" data-content="${char}"/>`;
+                html += `<div class="chord-fret" data-content="${char}"></div>`;
             }
         }
         html += `</div>`; // Конец блока для одной схемы
     });
 
-    html += `</div>
-				</div>`; // Конец контейнера и блока аккорда
+    html += `</div></div>`; // Конец контейнера и блока аккорда
 
     return html;
 }
@@ -640,7 +646,11 @@ function renderChordDiagram(diagramsArray, chordName) {
                 s
                   .split("")
                   .map((x) => parseInt(x, 10))
-                  .filter((n) => !isNaN(n) && n >= 1 && n <= 7) ), ]; return indices .map((i)=> ({ chord: chords[i - 1], step: i }))
+                  .filter((n) => !isNaN(n) && n >= 1 && n <= 7)
+              ),
+            ];
+            return indices
+              .map((i) => ({ chord: chords[i - 1], step: i }))
               .filter((x) => x.chord);
           }
         }
@@ -691,10 +701,110 @@ function renderChordDiagram(diagramsArray, chordName) {
               weight = 0;
             }
 
-            for (let i = 0; i < weight;i++) candidates.push(idx); }); if (candidates.length===0) return null; let chosenIdx=candidates[Math.floor(Math.random() * candidates.length)]; return { chord: selectedChords[chosenIdx], step: selectedSteps[chosenIdx], }; } --- ОСНОВНАЯ ЛОГИКА И УПРАВЛЕНИЕ СОСТОЯНИЕМ --- input.focus(); input.addEventListener("keydown", function (e) { if (e.key==="Enter" ) { e.preventDefault(); e.stopPropagation(); const userInput=input.value.trim(); input.value="" ; handle(userInput); scrollToBottom(); } }); document.addEventListener("click", function () { input.focus(); }); function handle(userInput) { if (userInput) { * print("📝Вы ввели:'" + userInput + "' "); * print(""); } if (state==="chooseKeyNum" ) { const choice=userInput.trim(); --- НОВАЯ ЛОГИКА ДЛЯ ВЫБОРА В ОДИН КЛИК --- if (choice.includes(",")) { const [choiceNum, mode]=choice.split("," ); const numericChoice=parseInt(choiceNum); const majors=Vocabulary.keyPairs.map((p)=> p[0]);
+            for (let i = 0; i < weight; i++) candidates.push(idx);
+          });
+
+          if (candidates.length === 0) return null;
+
+          let chosenIdx =
+            candidates[Math.floor(Math.random() * candidates.length)];
+          return {
+            chord: selectedChords[chosenIdx],
+            step: selectedSteps[chosenIdx],
+          };
+        }
+
+        // --- ОСНОВНАЯ ЛОГИКА И УПРАВЛЕНИЕ СОСТОЯНИЕМ ---
+        input.focus();
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            const userInput = input.value.trim();
+            input.value = "";
+            handle(userInput);
+            scrollToBottom();
+          }
+        });
+        // document.addEventListener("click", function () {
+        //   input.focus();
+        // });
+
+        function handle(userInput) {
+          if (userInput) {
+            /* print("📝Вы ввели: '" + userInput + "'"); */
+            print("");
+          }
+
+          if (state === "chooseKeyNum") {
+            const choice = userInput.trim();
+
+                        // --- НОВАЯ ЛОГИКА ДЛЯ ВЫБОРА В ОДИН КЛИК ---
+                        if (choice.includes(",")) {
+              const [choiceNum, mode] = choice.split(",");
+              const numericChoice = parseInt(choiceNum);
+              const majors = Vocabulary.keyPairs.map((p) => p[0]);
               const minors = Vocabulary.keyPairs.map((p) => p[1]);
 
-              if (!isNaN(numericChoice) && numericChoice >= 1 && numericChoice <= majors.length){ keyIdx=numericChoice - 1; Сразу выбираем тональность на основе mode ('maj' или'min' ) key=mode=== 'maj'? majors[keyIdx] : minors[keyIdx]; И сразу переходим к следующему шагу, минуя'chooseKeyType' chooseChords(); return; Важно выйти из функции, чтобы не выполнился код ниже } } --- НОВАЯ ЛОГИКА ДЛЯ ВВОДА"00" --- if (choice==="00" ) { print("⚡️Быстрый старт: выбираем случайную тональность и сразу генерируем последовательность...🎲" ); print("Вжух!"); Шаг 1: Выбираем случайный номер строки от 1 до 15 keyIdx=Math.floor(Math.random() * 15); Шаг 2: Случайно выбираем лад (0 - мажор, 1 - минор) const randomMode=Math.round(Math.random()); key=Vocabulary.keyPairs[keyIdx][randomMode]; Шаг 3: Сразу выбираем все аккорды этой тональности selectedChords=Vocabulary.allChords[key].slice(); Создаем копию массива selectedSteps=[1, 2, 3, 4, 5, 6, 7]; Все ступени Шаг 4: Устанавливаем длину последовательности в 4 sequenceLength=4; Шаг 5: Запускаем генерацию generate(); return; ВАЖНО: выходим из функции handle, чтобы не выполнять остальной код } --- КОНЕЦ НОВОЙ ЛОГИКИ --- if (choice==="0" ) { Генерируем случайный номер строки от 1 до 15 keyIdx=Math.floor(Math.random() * 15); Генерируем случайное число 0 или 1 для выбора лада 0 -> Мажор, 1 -> Минор const randomMode=Math.round(Math.random()); Выбираем тональность напрямую из массива пар key=Vocabulary.keyPairs[keyIdx][randomMode]; print("🎲 Выбор тональности был доверен случаю. Что же достанется вам на этот раз?" ); print("\n"); Добавляем перенос для красоты chooseChords(); Сразу переходим к выбору аккордов } else { Старая логика для ручного ввода номера Новая логика для ручного ввода номера или случайного выбора const numericChoice=parseInt(choice); const majors=Vocabulary.keyPairs.map((p)=> p[0]);
+              if (!isNaN(numericChoice) && numericChoice >= 1 && numericChoice <= majors.length) {
+                keyIdx = numericChoice - 1;
+                // Сразу выбираем тональность на основе mode ('maj' или 'min')
+                key = mode === 'maj' ? majors[keyIdx] : minors[keyIdx];
+                // И сразу переходим к следующему шагу, минуя 'chooseKeyType'
+                chooseChords();
+                return; // Важно выйти из функции, чтобы не выполнился код ниже
+              }
+            }
+
+            // --- НОВАЯ ЛОГИКА ДЛЯ ВВОДА "00" ---
+            if (choice === "00") {
+              print(
+                "⚡️Быстрый старт: выбираем случайную тональность и сразу генерируем последовательность...🎲"
+              );
+              print("Вжух!");
+
+              // Шаг 1: Выбираем случайный номер строки от 1 до 15
+              keyIdx = Math.floor(Math.random() * 15);
+
+              // Шаг 2: Случайно выбираем лад (0 - мажор, 1 - минор)
+              const randomMode = Math.round(Math.random());
+              key = Vocabulary.keyPairs[keyIdx][randomMode];
+
+              // Шаг 3: Сразу выбираем все аккорды этой тональности
+              selectedChords = Vocabulary.allChords[key].slice(); // Создаем копию массива
+              selectedSteps = [1, 2, 3, 4, 5, 6, 7]; // Все ступени
+
+              // Шаг 4: Устанавливаем длину последовательности в 4
+              sequenceLength = 4;
+
+              // Шаг 5: Запускаем генерацию
+              generate();
+
+              return; // ВАЖНО: выходим из функции handle, чтобы не выполнять остальной код
+            }
+            // --- КОНЕЦ НОВОЙ ЛОГИКИ ---
+
+            if (choice === "0") {
+              // Генерируем случайный номер строки от 1 до 15
+              keyIdx = Math.floor(Math.random() * 15);
+
+              // Генерируем случайное число 0 или 1 для выбора лада
+              // 0 -> Мажор, 1 -> Минор
+              const randomMode = Math.round(Math.random());
+
+              // Выбираем тональность напрямую из массива пар
+              key = Vocabulary.keyPairs[keyIdx][randomMode];
+
+              print(
+                "🎲 Выбор тональности был доверен случаю. Что же достанется вам на этот раз?"
+              );
+              print("\n"); // Добавляем перенос для красоты
+              chooseChords(); // Сразу переходим к выбору аккордов
+            } else {
+              // Старая логика для ручного ввода номера
+            // Новая логика для ручного ввода номера или случайного выбора
+            const numericChoice = parseInt(choice);
+            const majors = Vocabulary.keyPairs.map((p) => p[0]);
 
             if (!isNaN(numericChoice)) {
                 if (numericChoice === 0) {
@@ -713,8 +823,32 @@ function renderChordDiagram(diagramsArray, chordName) {
                     chooseChords();
                     return; // ВАЖНО: выходим из функции handle
 
-                } else if (numericChoice >= 1 && numericChoice <= majors.length){ Логика для выбора конкретной строки (1-15) keyIdx=numericChoice - 1; print("🎭 Мажор (M) [⤶] или минор (m):");
-                    state = " chooseKeyType"; } else { print("Неверный выбор. Используется C-dur"); key=majors[0]; chooseChords(); } } else { --- НОВАЯ ЛОГИКА --- Если пользователь нажал Enter с пустым вводом (choice==="" ) if (choice==="" ) { print("Тональность не выбрана. Используется базовая C-dur."); key=majors[0]; majors[0] — это"C-dur" chooseChords(); Сразу переходим к выбору аккордов return; Обязательно выходим из функции } else { Если ввод не пуст и не является числом, выводим старую ошибку print("Неверный ввод. Пожалуйста, введите число от 0 до 15."); }} } } else if (state==="chooseKeyType" ) { const answerType=userInput.trim(); const majors=Vocabulary.keyPairs.map((p)=> p[0]);
+                } else if (numericChoice >= 1 && numericChoice <= majors.length) {
+                    // Логика для выбора конкретной строки (1-15)
+                    keyIdx = numericChoice - 1;
+                    print("🎭 Мажор (M)/[⤶] или минор (m): ");
+                    state = "chooseKeyType";
+                } else {
+                    print("Неверный выбор. Используется C-dur");
+                    key = majors[0];
+                    chooseChords();
+                }
+              } else {
+                // --- НОВАЯ ЛОГИКА ---
+                // Если пользователь нажал Enter с пустым вводом (choice === "")
+                if (choice === "") {
+                    print("Тональность не выбрана. Используется базовая C-dur.");
+                    key = majors[0]; // majors[0] — это "C-dur"
+                    chooseChords(); // Сразу переходим к выбору аккордов
+                    return; // Обязательно выходим из функции
+                } else {
+                    // Если ввод не пуст и не является числом, выводим старую ошибку
+                    print("Неверный ввод. Пожалуйста, введите число от 0 до 15.");
+                }}
+            }
+          } else if (state === "chooseKeyType") {
+            const answerType = userInput.trim();
+            const majors = Vocabulary.keyPairs.map((p) => p[0]);
             const minors = Vocabulary.keyPairs.map((p) => p[1]);
             key =
               answerType === "m" || answerType === "moll"
@@ -742,11 +876,34 @@ function renderChordDiagram(diagramsArray, chordName) {
             askCount();
           } else if (state === "askCount") {
             sequenceLength = parseInt(userInput);
-            if (isNaN(sequenceLength) || sequenceLength < 3){ sequenceLength=3; print("Минимальная длина последовательности — 3. Установлено значение: 3" ); } generate(); } else if (state==="askRepeat" ) { if (userInput==="1" ) generate(); else if (userInput==="2" ) chooseChords(); else if (userInput==="3" ) start(); } } function start() { state="chooseKeyNum" ; output.innerHTML="" ; Полностью очищаем блок вывода print(NOTE + GUITAR +" A-kordey / Аккорды " + PIANO + NOTES); print("генератор последовательностей аккордов"); print("by Dm.Isanin 🤘"); print("Версия 4.2 от 18.06.2026"); print("\nЯ, будучи веб-приложением, сгенерирую для вас последовательность сочетающихся аккордов в любой тональности."); printHTML(`<button data-action="00">⚡️ Быстрая генерация</button>`);            
+            if (isNaN(sequenceLength) || sequenceLength < 3) {
+              sequenceLength = 3;
+              print(
+                "Минимальная длина последовательности — 3. Установлено значение: 3"
+              );
+            }
+            generate();
+          } else if (state === "askRepeat") {
+            if (userInput === "1") generate();
+            else if (userInput === "2") chooseChords();
+            else if (userInput === "3") start();
+          }
+        }
+
+        function start() {
+            state = "chooseKeyNum";
+            output.innerHTML = ""; // Полностью очищаем блок вывода
+
+            print(NOTE + GUITAR + " A-kordey / Аккорды " + PIANO + NOTES);
+            print("генератор последовательностей аккордов");
+            print("by Dm.Isanin 🤘");
+            print("Версия 4.2 от 18.06.2026");
+            print("\nЯ, будучи веб-приложением, сгенерирую для вас последовательность сочетающихся аккордов в любой тональности.");
+            printHTML(`<button data-action="00">⚡️ Быстрая генерация</button>`);            
             
             printHTML(`
               <button id="toggle-intro-btn" onclick="toggleIntro()">➕Больше про меня</button>
-								<div id="intro-content" style="display:none; margin-top:-8px;">
+              <div id="intro-content" style="display:none; margin-top:-8px;">
                 \n\"Общаться\" со мной можно через нажатия кнопок или текстовое поле ввода внизу страницы (0-9, M/m).
 
                 \n\Аккорды используются базовые: трезвучия минорное, мажорное и уменьшённое. Хорошая новость для гитаристов в том, что схемы этих аккордов для грифа гитары. 
@@ -869,25 +1026,25 @@ function renderChordDiagram(diagramsArray, chordName) {
 
             let formHTML = `
                 <form id="chord-selection-form">
-									<div id="chord-checkboxes">
+                    <div id="chord-checkboxes">
             `;
 
             chordsInKey.forEach((c, i) => {
                 formHTML += `
                     <label class="chord-checkbox">
-											<input type="checkbox" name="chord" value="${i + 1}" checked> ${i + 1}. ${c}
-										</label>
+                        <input type="checkbox" name="chord" value="${i + 1}" checked> ${i + 1}. ${c}
+                    </label>
                 `;
             });
 
             formHTML += `
                     <div class="input-line">
-											<span class="prompt"/>
-											<!-- Пустой prompt, чтобы сохранить стиль -->
-											<button type="submit" class="ready-btn">Готово</button>
-											<button type="button" class="select-all-btn">Выбрать все</button>
-											<button type="button" class="deselect-all-btn">Снять выделение</button>
-										</div>
+                        <span class="prompt"></span> <!-- Пустой prompt, чтобы сохранить стиль -->
+                        <button type="submit" class="ready-btn">Готово</button>
+                        <button type="button" class="select-all-btn">Выбрать все</button>
+                        <button type="button" class="deselect-all-btn">Снять выделение</button>
+
+                    </div>
                     
             `;
 /*                        <button type="button" class="ready-btn" onclick="selectChord(0)">Вывести все по порядку</button>*/
@@ -966,7 +1123,9 @@ function renderChordDiagram(diagramsArray, chordName) {
             print("\nМожете ввести число в поле ниже или выбрать вариант:");
 
             // --- НОВЫЙ КОД ---
-            for (let i = 3; i <= 8; i++) { Используем data-length для передачи числа printHTML(`<button data-length="${i}">${i} аккорда(ов)</button>`);
+            for (let i = 3; i <= 8; i++) {
+                // Используем data-length для передачи числа
+                printHTML(`<button data-length="${i}">${i} аккорда(ов)</button>`);
             }
         }
 
@@ -1005,7 +1164,40 @@ function renderChordDiagram(diagramsArray, chordName) {
                 }
             }
 
-            while (sequenceChords.length < sequenceLength) { let nextItem; if (currentStep===null) { nextItem=chooseNextChord(null); } else { nextItem=chooseNextChord(currentStep); } if (!nextItem) break; sequenceChords.push(nextItem.chord); sequenceStepsArr.push(nextItem.step); currentStep=nextItem.step; } Применяем каданс в конце, если он был выбран if (selectedCadenceInfo && forbidVtoIV) { Отрезаем последние аккорды, чтобы заменить их кадансом Используем .length, чтобы точно отрезать от конца текущей последовательности sequenceChords.splice(sequenceChords.length - selectedCadenceInfo.templateSteps.length); sequenceStepsArr.splice(sequenceStepsArr.length - selectedCadenceInfo.templateSteps.length); for (let stepNum of selectedCadenceInfo.templateSteps) { const indexInSelected=selectedSteps.indexOf(stepNum); if (indexInSelected !==-1) { sequenceChords.push(selectedChords[indexInSelected]); sequenceStepsArr.push(stepNum); } else { let replacement=findReplacementByFunction(getChordFunction(stepNum)); if (replacement) { sequenceChords.push(replacement.chord); sequenceStepsArr.push(replacement.step); } else if (sequenceChords.length> 0) {
+            while (sequenceChords.length < sequenceLength) {
+                let nextItem;
+
+                if (currentStep === null) {
+                    nextItem = chooseNextChord(null);
+                } else {
+                    nextItem = chooseNextChord(currentStep);
+                }
+
+                if (!nextItem) break;
+
+                sequenceChords.push(nextItem.chord);
+                sequenceStepsArr.push(nextItem.step);
+                currentStep = nextItem.step;
+            }
+
+            // Применяем каданс в конце, если он был выбран
+            if (selectedCadenceInfo && forbidVtoIV) {
+                // Отрезаем последние аккорды, чтобы заменить их кадансом
+                // Используем .length, чтобы точно отрезать от конца текущей последовательности
+                sequenceChords.splice(sequenceChords.length - selectedCadenceInfo.templateSteps.length);
+                sequenceStepsArr.splice(sequenceStepsArr.length - selectedCadenceInfo.templateSteps.length);
+
+                for (let stepNum of selectedCadenceInfo.templateSteps) {
+                    const indexInSelected = selectedSteps.indexOf(stepNum);
+                    if (indexInSelected !== -1) {
+                        sequenceChords.push(selectedChords[indexInSelected]);
+                        sequenceStepsArr.push(stepNum);
+                    } else {
+                        let replacement = findReplacementByFunction(getChordFunction(stepNum));
+                        if (replacement) {
+                            sequenceChords.push(replacement.chord);
+                            sequenceStepsArr.push(replacement.step);
+                        } else if (sequenceChords.length > 0) {
                             sequenceChords.push(sequenceChords[sequenceChords.length - 1]);
                             sequenceStepsArr.push(sequenceStepsArr[sequenceStepsArr.length - 1]);
                         }
@@ -1021,7 +1213,12 @@ let chordsOutput = `\n🎶 Ваша последовательность в то
 
 // Собираем аккорды в одну строку с переносами
 let chordsString = "";
-for (let i = 0; i < sequenceChords.length; i +=8) { chordsString +=sequenceChords.slice(i, i + 8).join("") + " \n"; } Оборачиваем аккорды в стилизованный блок и добавляем к заголовку chordsOutput +=`<div style="background:#3a3a3a; border:1px solid #555; padding:8px; border-radius:4px; margin-top:5px;">`;
+for (let i = 0; i < sequenceChords.length; i += 8) {
+    chordsString += sequenceChords.slice(i, i + 8).join(" ") + "\n";
+}
+
+// Оборачиваем аккорды в стилизованный блок и добавляем к заголовку
+chordsOutput += `<div style="background:#3a3a3a; border:1px solid #555; padding:8px; border-radius:4px; margin-top:5px;">`;
 chordsOutput += chordsString.trim(); // .trim() убирает лишний перенос строки в конце
 chordsOutput += `</div>`;
 
@@ -1060,5 +1257,5 @@ printHTML(chordsOutput);
         start(); // Запуск программы при загрузке страницы
       });
     </script>
-									</body>
-								</html>
+  </body>
+</html>
