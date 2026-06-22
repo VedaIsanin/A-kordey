@@ -86,7 +86,7 @@ td {
 }
 
 td:hover::after {
-    content: "👈" attr(data-full-text);
+    content: "👈";
     position: absolute;
     background: #252526;
     border: 1px solid #555;
@@ -136,32 +136,33 @@ td:hover::after {
 }
 
 /* --- НОВЫЕ СТИЛИ ДЛЯ РАВНОГО РАЗМЕРА БОКСОВ (ключевое изменение) --- */
+/* --- СТИЛИ ДЛЯ РАВНОГО РАЗМЕРА БОКСОВ (ключевое изменение) --- */
 .chord-diagram .chord-string {
      margin-bottom: -3px; /* Убирает зазор между строками схемы */
 }
 
 .chord-diagram .chord-fret,
 .chord-diagram .chord-fret-x {
-     display: flex; /* Для центрирования содержимого */
-     justify-content: center;
-     align-items: center;
+     display: flex; /* Включаем флекс-модель для центрирования */
+     justify-content: center; /* Центрируем по горизонтали */
+     align-items: center; /* Центрируем по вертикали */
+     
      width: 11px; /* Единая ширина для всех боксов */
-     height: 18px; /* Единая высота */
+     height: 24px; /* Единая высота */
      margin-right: 2px; /* Отступ между боксами */
+     
      font-weight: bold;
-     /*font-size: 12px; /* Единый размер шрифта */
-     box-sizing: border-box; /* Чтобы padding не влиял на размер */
+     font-size: 16px; /* Размер шрифта теперь задается здесь */
+     line-height: 1; /* Нормальный line-height, чтобы не увеличивать высоту строки */
+     
+     box-sizing: border-box;
  }
 
-/* Стиль для крестика (теперь наследует размер) */
+/* Крестик (теперь просто текст внутри бокса) */
 .chord-diagram .chord-fret-x {
-     color: red; /* Красный цвет для 'x' остается */
+     color: red;
  }
 
-/* Выводим содержимое бокса через псевдоэлемент, чтобы сам бокс не менял размер */
-.chord-diagram .chord-fret {
-     font-size: 0; /* Обнуляем шрифт у контейнера */
- }
 
 .chord-diagram .chord-fret::before {
      content: attr(data-content); /* Берем текст из атрибута data-content */
@@ -357,37 +358,37 @@ function toggleIntro() {
           ],
           allChords: {
             // Мажоры
-            "C-dur": ["C", "Dm", "Em", "F", "G", "Am", "B" + DIM],
-            "G-dur": ["G", "Am", "Bm", "C", "D", "Em", "F#" + DIM],
-            "D-dur": ["D", "Em", "F#m", "G", "A", "Bm", "C#" + DIM],
-            "A-dur": ["A", "Bm", "C#m", "D", "E", "F#m", "G#" + DIM],
-            "E-dur": ["E", "F#m", "G#m", "A", "B", "C#m", "D#" + DIM],
-            "B-dur": ["B", "C#m", "D#m", "E", "F#", "G#m", "A#" + DIM],
-            "F#-dur": ["F#", "G#m", "A#m", "B", "C#", "D#m", "E#" + DIM],
-            "C#-dur": ["C#", "D#m", "E#m", "F#", "G#", "A#m", "B#" + DIM],
-            "Cb-dur": ["Cb", "Dbm", "Ebm", "Fb", "Gb", "Abm", "Bb" + DIM],
-            "Gb-dur": ["Gb", "Abm", "Bbm", "Cb", "Db", "Ebm", "F" + DIM],
-            "Db-dur": ["Db", "Ebm", "Fm", "Gb", "Ab", "Bbm", "C" + DIM],
-            "Ab-dur": ["Ab", "Bbm", "Cm", "Db", "Eb", "Fm", "G" + DIM],
-            "Eb-dur": ["Eb", "Fm", "Gm", "Ab", "Bb", "Cm", "D" + DIM],
-            "Bb-dur": ["Bb", "Cm", "Dm", "Eb", "F", "Gm", "A" + DIM],
-            "F-dur": ["F", "Gm", "Am", "Bb", "C", "Dm", "E" + DIM],
+            "C-dur": ["C", "Dm", "Em", "F", "G", "Am", "B°"],
+            "G-dur": ["G", "Am", "Bm", "C", "D", "Em", "F#°"],
+            "D-dur": ["D", "Em", "F#m", "G", "A", "Bm", "C#°"],
+            "A-dur": ["A", "Bm", "C#m", "D", "E", "F#m", "G#°"],
+            "E-dur": ["E", "F#m", "G#m", "A", "B", "C#m", "D#°"],
+            "B-dur": ["B", "C#m", "D#m", "E", "F#", "G#m", "A#°"],
+            "F#-dur": ["F#", "G#m", "A#m", "B", "C#", "D#m", "E#°"],
+            "C#-dur": ["C#", "D#m", "E#m", "F#", "G#", "A#m", "B#°"],
+            "Cb-dur": ["Cb", "Dbm", "Ebm", "Fb", "Gb", "Abm", "Bb°"],
+            "Gb-dur": ["Gb", "Abm", "Bbm", "Cb", "Db", "Ebm", "F°"],
+            "Db-dur": ["Db", "Ebm", "Fm", "Gb", "Ab", "Bbm", "C°"],
+            "Ab-dur": ["Ab", "Bbm", "Cm", "Db", "Eb", "Fm", "G°"],
+            "Eb-dur": ["Eb", "Fm", "Gm", "Ab", "Bb", "Cm", "D°"],
+            "Bb-dur": ["Bb", "Cm", "Dm", "Eb", "F", "Gm", "A°"],
+            "F-dur": ["F", "Gm", "Am", "Bb", "C", "Dm", "E°"],
             // Миноры
-            "A-moll": ["Am", "B" + DIM, "C", "Dm", "Em", "F", "G"],
-            "E-moll": ["Em", "F#" + DIM, "G", "Am", "Bm", "C", "D"],
-            "B-moll": ["Bm", "C#" + DIM, "D", "Em", "F#m", "G", "A"],
-            "F#-moll": ["F#m", "G#" + DIM, "A", "Bm", "C#m", "D", "E"],
-            "C#-moll": ["C#m", "D#" + DIM, "E", "F#m", "G#m", "A", "B"],
-            "G#-moll": ["G#m", "A#" + DIM, "B", "C#m", "D#m", "E", "F#"],
-            "Ab-moll": ["Abm", "Bb" + DIM, "Cb", "Dbm", "Ebm", "Fb", "Gb"],
-            "Eb-moll": ["Eb", "F" + DIM, "Gb", "Ab", "Bb", "Cm", "D"],
-            "Bb-moll": ["Bb", "C" + DIM, "Db", "Eb", "Fm", "G", "Ab"],
-            "F-moll": ["Fm", "G" + DIM, "Ab", "Bbm", "Cm", "D", "Eb"],
-            "C-moll": ["Cm", "D" + DIM, "Eb", "Fm", "Gm", "Ab", "Bb"],
-            "G-moll": ["Gm", "A" + DIM, "Bb", "Cm", "Dm", "Eb", "F"],
-            "D-moll": ["Dm", "E" + DIM, "F", "Gm", "Am", "Bb", "C"],
-            "D#-moll": ["D#m", "E#" + DIM, "F#", "G#m", "A#m", "Bb", "C#"],
-            "A#-moll": ["A#m", "B#" + DIM, "C#", "D#m", "E#m", "F#", "G#"],
+            "A-moll": ["Am", "B°", "C", "Dm", "Em", "F", "G"],
+            "E-moll": ["Em", "F#°", "G", "Am", "Bm", "C", "D"],
+            "B-moll": ["Bm", "C#°", "D", "Em", "F#m", "G", "A"],
+            "F#-moll": ["F#m", "G#°", "A", "Bm", "C#m", "D", "E"],
+            "C#-moll": ["C#m", "D#°", "E", "F#m", "G#m", "A", "B"],
+            "G#-moll": ["G#m", "A#°", "B", "C#m", "D#m", "E", "F#"],
+            "Ab-moll": ["Abm", "Bb°", "Cb", "Dbm", "Ebm", "Fb", "Gb"],
+            "Eb-moll": ["Eb", "F°", "Gb", "Ab", "Bb", "Cm", "D"],
+            "Bb-moll": ["Bb", "C°", "Db", "Eb", "Fm", "G", "Ab"],
+            "F-moll": ["Fm", "G°", "Ab", "Bbm", "Cm", "D", "Eb"],
+            "C-moll": ["Cm", "D°", "Eb", "Fm", "Gm", "Ab", "Bb"],
+            "G-moll": ["Gm", "A°", "Bb", "Cm", "Dm", "Eb", "F"],
+            "D-moll": ["Dm", "E°", "F", "Gm", "Am", "Bb", "C"],
+            "D#-moll": ["D#m", "E#°", "F#", "G#m", "A#m", "Bb", "C#"],
+            "A#-moll": ["A#m", "B#°", "C#", "D#m", "E#m", "F#", "G#"],
           },
 
           // НОВОЕ: Справочник видов кадансов
@@ -454,9 +455,9 @@ function toggleIntro() {
             // -- МИНОРНЫЕ АККОРДЫ --
             "Cm": ["x-3-5-5-4-3", "8-10-10-8-8"],
             "Dm": ["x-x-0-2-3-1", "x-5-7-7-6-5", "x-5-3-2-x-x", "x-5-3-x-3-5"],
-            "Em": ["0-2-2-0-0-0", "x-x-2-4-3-5", "x-7-9-9-8-7"],
-            "Fm": ["1-3-3-1-1-1", "x-8-10-10-9"],
-            "Gm": ["3-5-5-3-3-3", "3-5-5-3-6-3"],
+            "Em": ["0-2-2-0-0-0", "0-x-2-4-3-5", "x-7-9-9-8-7", "x-X-9-11-10-12"],
+            "Fm": ["1-3-3-1-1-1", "x-8-10-10-9-8", "x-x-10-12-11-13"],
+            "Gm": ["3-1-0-3-3-x", "3-5-5-3-3-3", "x-x-5-7-6-8"],
             "Am": ["x-0-2-2-1-0", "5-7-7-5-5-5"],
             "Bm": ["x-2-4-4-3-2", "7-9-9-7-7-7", "x-2-4-4-3-2", "x-x-9-11-9-12", "x-x-9-11-0-12"], 
 
@@ -464,7 +465,6 @@ function toggleIntro() {
             "E#m": ["1-3-3-1-1-1", "x-x-3-5-4-6", "x-7-9-9-8-7"],
             "F#m": ["2-4-4-2-2-2", "x-9-11-11-10-9"],
             "C#m": ["x-4-6-6-5-4", "9-11-11-9-9-9"],
-            
             "Dbm": ["x-4-6-6-5-4", "9-11-11-9-9-9"],
             "Ebm": ["x-x-1-3-2-4", "x-6-8-8-7-6"],
             "Bbm": ["x-1-3-3-2-1", "6-8-8-6-6-6", "x-x-8-10-9-11"],
@@ -482,9 +482,9 @@ function toggleIntro() {
             "D°": ["x-5-6-5-6-x"],
             "E°": ["0-7-6-7-x-x"],
             "F°": [
-                "x-x-3-1-2-1",  // Вариант 3 (на 1-3 ладах)
-                "x-8-7-6-8-x", // Вариант 1 (на 8 ладу)
-                "1-2-3-1-x-x" // Вариант 2 (на 1-3 ладах)
+                "x-x-3-1-2-1",  // Вариант 1 (на 1-3 ладах)
+                "x-8-7-6-8-x", // Вариант 2 (на 8 ладу)
+                "1-2-3-1-x-x" // Вариант 3 (на 1-3 ладах)
             ],
             "G°": ["3-x-6-5-6-x"],
 
@@ -513,6 +513,42 @@ function toggleIntro() {
 
         let output = document.getElementById("output");
         let input = document.getElementById("input");
+        function copyToClipboard() {
+                  const outputDiv = document.getElementById('output');
+                  if (!outputDiv) return;
+
+                  let textToCopy = '';
+                  for (const node of outputDiv.childNodes) {
+                      if (node.innerText) {
+                          textToCopy += node.innerText + '\n';
+                      } else if (node.textContent) {
+                          textToCopy += node.textContent + '\n';
+                      }
+                  }
+
+                  // Создаем невидимое текстовое поле для старого метода
+                  const tempInput = document.createElement("textarea");
+                  tempInput.value = textToCopy.trim();
+                  
+                  // Добавляем на страницу, выделяем текст и пытаемся скопировать
+                  document.body.appendChild(tempInput);
+                  tempInput.select();
+                  tempInput.setSelectionRange(0, 99999); // Для мобильных устройств
+
+                  try {
+                      // Пробуем выполнить команду копирования
+                      document.execCommand('copy');
+                      print("✅ Последовательность успешно скопирована!");
+                  } catch (err) {
+                      print("⚠️ Не удалось скопировать текст.");
+                      console.error(err);
+                  } finally {
+                      // Обязательно удаляем временное поле, даже если копирование не удалось
+                      document.body.removeChild(tempInput);
+                  }
+              }
+
+
         let state = "";
         let key = "";
         let keyIdx = 0;
@@ -555,6 +591,10 @@ function toggleIntro() {
           output.scrollTop = output.scrollHeight;
         }
 
+                    // --- НОВАЯ ФУНКЦИЯ: Копирование в буфер обмена через Async Clipboard API ---
+              // --- ФУНКЦИЯ ДЛЯ КОПИРОВАНИЯ В БУФЕР ОБМЕНА ---
+
+
         // --- НОВАЯ ФУНКЦИЯ ДЛЯ КНОПОК "ВЫБРАТЬ ВСЕ" / "СНЯТЬ ВСЕ" ---
         function toggleAllCheckboxes(shouldCheck) {
             // Находим все элементы <input type="checkbox"> внутри блока #chord-checkboxes
@@ -581,46 +621,43 @@ function toggleIntro() {
              scrollToBottom();
          }
 
-            // Принимает МАССИВ схем (diagramsArray) и название аккорда (chordName)
-// Принимает МАССИВ схем (diagramsArray) и название аккорда (chordName)
-function renderChordDiagram(diagramsArray, chordName) {
-    // Если массив схем пустой или не существует, ничего не рисуем или выводим сообщение
-    if (!diagramsArray || diagramsArray.length === 0) {
-        return `<div style="color:#ff6666;">Схемы для ${chordName} не найдены</div>`;
-    }
+      // Принимает МАССИВ схем (diagramsArray) и название аккорда (chordName)
+      function renderChordDiagram(diagramsArray, chordName) {
+          // Если массив схем пустой или не существует, ничего не рисуем или выводим сообщение
+          if (!diagramsArray || diagramsArray.length === 0) {
+              return `<div style="color:#ff6666;">Схемы для ${chordName} не найдены</div>`;
+          }
 
-    let html = `<div class="chord-diagram">`;
+          let html = `<div class="chord-diagram">`;
 
-    // Добавляем название аккорда только один раз, над всеми схемами
-    html += `<div class="chord-name">${chordName}</div>`;
-    html += `<div class="chord-diagram-container">`;
+          // Добавляем название аккорда только один раз, над всеми схемами
+          html += `<div class="chord-name">${chordName}</div>`;
+          html += `<div class="chord-diagram-container">`;
 
-    // Проходим по КАЖДОЙ схеме в массиве
-    diagramsArray.forEach(diagram => {
-        html += `<div class="chord-string">`; // Начало блока для одной схемы
+          // Проходим по КАЖДОЙ схеме в массиве
+          diagramsArray.forEach(diagram => {
+              html += `<div class="chord-string">`; // Начало блока для одной схемы
 
-        // Проходим по каждому символу в строке аппликатуры
-        for (let j = 0; j < diagram.length; j++) {
-            const char = diagram[j];
+              // Проходим по каждому символу в строке аппликатуры
+              for (let j = 0; j < diagram.length; j++) {
+                  const char = diagram[j];
 
-            if (char === 'x') {
-                // Для крестика используем класс .chord-fret-x, но сам символ вставим через CSS
-                html += `<div class="chord-fret chord-fret-x" data-content="x"></div>`;
-            } else if (char === '0' || (!isNaN(char))) { // '0' или любая цифра
-                // Для цифр используем обычный .chord-fret
-                html += `<div class="chord-fret" data-content="${char}"></div>`;
-            } else {
-                // Для дефисов '-' и других символов оставляем пустой бокс с нужным размером
-                html += `<div class="chord-fret" data-content="${char}"></div>`;
-            }
-        }
-        html += `</div>`; // Конец блока для одной схемы
-    });
+                  if (char === 'x') {
+                      // Для крестика просто выводим текст 'x' внутрь бокса
+                      html += `<div class="chord-fret chord-fret-x">x</div>`;
+                  } else {
+                      // Для цифр, дефисов и любых других символов
+                      // Просто выводим символ внутрь бокса.
+                      html += `<div class="chord-fret">${char}</div>`;
+                  }
+              }
+              html += `</div>`; // Конец блока для одной схемы
+          });
 
-    html += `</div></div>`; // Конец контейнера и блока аккорда
+          html += `</div></div>`; // Конец контейнера и блока аккорда
 
-    return html;
-}
+          return html;
+      }
 
         function getDimStep(keyName) {
           return keyName.includes("-dur") ? 7 : 2;
@@ -919,7 +956,7 @@ function renderChordDiagram(diagramsArray, chordName) {
             print(NOTE + GUITAR + " A-kordey / Аккорды " + PIANO + NOTES);
             print("генератор последовательностей аккордов");
             print("by Dm.Isanin 🤘");
-            print("Версия 4.4 от 18.06.2026");
+            print("Версия 4.5 от 18.06.2026");
             print("\nЯ, будучи веб-приложением, сгенерирую для вас последовательность сочетающихся аккордов в любой тональности.");
             printHTML(`<button data-action="00">⚡️ Быстрая генерация</button>`);            
             
@@ -1226,6 +1263,8 @@ function renderChordDiagram(diagramsArray, chordName) {
                 }
             }
 
+
+
             // --- БЛОК ВЫВОДА РЕЗУЛЬТАТОВ ---
 
             // 1. Выводим сгенерированную последовательность аккордов
@@ -1269,10 +1308,11 @@ printHTML(chordsOutput);
 
             // 5. Задаем вопрос о дальнейших действиях
             print("\nЧто делаем дальше?");
+            // printHTML(`<button class="ready-btn" onclick="copyToClipboard()">📋 Копировать всё</button>`);
             printHTML(`<button data-action="1">🔁 Сгенерировать еще раз</button>`);
             printHTML(`<button data-action="2">🎹 Выбрать другие аккорды</button>`);
             printHTML(`<button data-action="3">🎼 Выбрать другую тональность</button>`);
-            print(" Ctrl+R — обновить страницу");
+            print("Ctrl+R в веб-приложении или свайп вниз на моб.устройстве, чтобы — обновить страницу");
         }
 
         start(); // Запуск программы при загрузке страницы
